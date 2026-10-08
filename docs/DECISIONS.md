@@ -24,3 +24,7 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: Startup check makes one authenticated call (asset statistics). Version and features are public, so they do not prove the key works.
 - 2026-10-08: Split task 4 into 4a (core) and 4b (wiring). Sessions need SQLite, so 4a brings a minimal migrations runner forward from task 5.
 - 2026-10-08: Deny better-sqlite3 install script via allowScripts. It ships prebuilds for linux glibc and musl; the script only runs node-gyp when none match.
+- 2026-10-08: APP_PASSWORD_HASH is the argon2id PHC string base64-encoded. Raw `$` is expanded by Vite's .env loader (even single-quoted) and by Docker Compose.
+- 2026-10-08: Session tokens are 32 random bytes, stored as SHA-256 only, absolute 30-day expiry. No sliding renewal; one user re-logs monthly.
+- 2026-10-08: Login rate limit is in memory, per IP, 5 failures per 15 minutes. Restart resets it, which gains an attacker nothing over waiting.
+- 2026-10-08: Migrations are bundled with import.meta.glob and tracked with PRAGMA user_version. No migrations table, no files read at runtime.
