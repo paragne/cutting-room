@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
-# Runs once when the container is created. Nothing here writes to the repo.
+# Runs once when the container is created. Installs only into gitignored or
+# user-scope paths; never writes tracked files.
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
-# Design skills, user scope (the claude-code-config volume).
-npx --yes impeccable@4.1.0 install --providers=claude --scope=global --no-hooks
-npx --yes skills@1.7.1 add https://github.com/Leonxlnx/taste-skill \
+IMPECCABLE_VERSION="4.1.0"
+SKILLS_CLI_VERSION="1.7.1"
+
+# Taste Skill, user scope (the claude-code-config volume).
+npx --yes "skills@${SKILLS_CLI_VERSION}" add https://github.com/Leonxlnx/taste-skill \
   --skill design-taste-frontend --global --agent claude-code --yes
+
+# Impeccable, project scope, UI repos only. The detector hook needs project
+# scope. The marker is the gitignore block new-repo.sh --ui writes. The repo
+# is bind-mounted, so this only runs on a fresh clone; rebuilds keep the install.
+if grep -q "impeccable-ignore-start" .gitignore 2>/dev/null; then
+  if [ -d .claude/skills/impeccable ]; then
+    echo "impeccable: already installed in project"
+  else
+    npx --yes "impeccable@${IMPECCABLE_VERSION}" install --providers=claude --scope=project </dev/null \
+      || echo "WARNING: impeccable install failed or wanted input. Run in the container: npx impeccable@${IMPECCABLE_VERSION} install --providers=claude --scope=project"
+  fi
+fi
 
 # Copy the hooks block from the host's settings.json into the container's,
 # rewriting host home paths to the container home. Other settings untouched.
