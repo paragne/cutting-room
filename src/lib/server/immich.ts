@@ -123,3 +123,33 @@ export async function getDuplicates(): Promise<DuplicateResponseDto[]> {
 	connect();
 	return sdk.getAssetDuplicates();
 }
+
+export type MediaKind = 'thumbnail' | 'preview' | 'video';
+
+// Never `fullsize`: Immich answers it with a redirect to the original, which needs
+// asset.download. The SDK's Blob calls buffer whole files, so this uses fetch.
+const MEDIA_PATH: Record<MediaKind, string> = {
+	thumbnail: 'thumbnail?size=thumbnail',
+	preview: 'thumbnail?size=preview',
+	video: 'video/playback'
+};
+
+export async function fetchMedia(
+	id: string,
+	kind: MediaKind,
+	range: string | null,
+	signal: AbortSignal
+): Promise<Response> {
+	const { immichUrl, immichApiKey } = getConfig();
+	const headers: Record<string, string> = {
+		'x-api-key': immichApiKey,
+		// Fetch would otherwise decompress and leave Content-Length describing the wrong body.
+		'accept-encoding': 'identity'
+	};
+	if (range !== null) headers.range = range;
+	return fetch(`${immichUrl}/api/assets/${id}/${MEDIA_PATH[kind]}`, {
+		headers,
+		redirect: 'error',
+		signal
+	});
+}

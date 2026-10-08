@@ -1,6 +1,13 @@
 import * as sdk from '@immich/sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type AssetFilter, checkServer, ImmichSafetyError, searchAssets, trashAssets } from './immich';
+import {
+	type AssetFilter,
+	checkServer,
+	fetchMedia,
+	ImmichSafetyError,
+	searchAssets,
+	trashAssets
+} from './immich';
 
 vi.mock('@immich/sdk', async (importOriginal) => ({
 	...(await importOriginal<typeof import('@immich/sdk')>()),
@@ -94,5 +101,44 @@ describe('searchAssets', () => {
 			trashedAt: { eq: null },
 			visibility: { eq: sdk.AssetVisibility.Timeline }
 		});
+	});
+});
+
+describe('fetchMedia', () => {
+	const id = '0b6f2c1e-8a4d-4f7e-9c3b-2d5a6e7f8091';
+	const signal = new AbortController().signal;
+
+	function call(): { url: string; init: RequestInit } {
+		const fetchMock = vi.mocked(fetch);
+		const [url, init] = fetchMock.mock.calls[0] ?? [];
+		return { url: String(url), init: init ?? {} };
+	}
+
+	beforeEach(() => vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null))));
+
+	it.each([
+		['thumbnail', `/api/assets/${id}/thumbnail?size=thumbnail`],
+		['preview', `/api/assets/${id}/thumbnail?size=preview`],
+		['video', `/api/assets/${id}/video/playback`]
+	] as const)('requests %s from its own path', async (kind, path) => {
+		await fetchMedia(id, kind, null, signal);
+		expect(call().url).toBe(`http://immich.test${path}`);
+	});
+
+	it('sends the key and range, does not follow redirects', async () => {
+		await fetchMedia(id, 'video', 'bytes=0-1023', signal);
+		const { init } = call();
+		expect(init.headers).toEqual({
+			'x-api-key': 'test-key',
+			'accept-encoding': 'identity',
+			range: 'bytes=0-1023'
+		});
+		expect(init.redirect).toBe('error');
+		expect(init.signal).toBe(signal);
+	});
+
+	it('sends no range header when none is given', async () => {
+		await fetchMedia(id, 'thumbnail', null, signal);
+		expect(call().init.headers).not.toHaveProperty('range');
 	});
 });
