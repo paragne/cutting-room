@@ -33,3 +33,7 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: Referrer-Policy is same-origin, not no-referrer. Under no-referrer browsers send `Origin: null` on same-origin form posts, which the Origin check refuses.
 - 2026-10-08: CSP via kit.csp in auto mode, so Kit adds nonces for its own inline scripts. Other headers are set in the handle hook, which returns refusals as responses so they get the headers too.
 - 2026-10-08: Unauthenticated /api requests get 401 JSON; other paths redirect to /login. A fetch caller can't use a redirect to a login page.
+- 2026-10-08: One decisions row per asset; a new decision replaces it and undo deletes it. The queue only needs "reviewed or not", and replacing keeps stats from double counting.
+- 2026-10-08: daily_stats counters are updated in the same transaction as decisions, so home screen stats and streak never scan the decisions table.
+- 2026-10-08: Trashed file size is stored on the decision at trash time, so "space trashed" needs no Immich call per asset.
+- 2026-10-08: The decision's day is passed in by the caller and stored on the row, so undo decrements the day it was counted on, not today.

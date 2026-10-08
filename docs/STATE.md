@@ -2,12 +2,10 @@
 
 ## Current task
 
-5. DB tables
+6. Media proxy
 
 ## Tasks (one per session, in order)
 
-5. DB: tables for decisions, daily stats, settings on the runner from 4a.
-   Prepared statements only. Tests on an in-memory DB.
 6. Media proxy: thumbnail, preview, video routes with UUID validation,
    Range passthrough, header allowlist. Use fetch, not SDK Blob calls; no
    fullsize, no redirect following. Tests with mocked Immich.
@@ -35,8 +33,9 @@
 1. Scaffold: SvelteKit 2.70.3, adapter-node 5.5.7, TS strict, eslint, vitest, `npm run check` passing.
 2. Immich API spike: server v3.2.0 and @immich/sdk 3.2.0 pinned, docs/IMMICH-API.md written, trash/restore verified live.
 3. Config and Immich client: `config.ts`, `log.ts`, `immich.ts`, startup check in `hooks.server.ts` `init` (version, trash, key), 26 tests. Verified live.
-4a. Auth core: `auth.ts` (argon2 check, hashed sessions, per-IP rate limit), `db.ts` with migrations runner and sessions table, base64 `APP_PASSWORD_HASH` and `DATA_DIR` in config, `scripts/hash-password.ts`, 44 tests. Dev server starts with real hash.
-4b. Auth wiring: `guard.ts` (Origin check on non-GET, 401 for /api, else redirect), hook with security headers, kit.csp, minimal login page, POST /logout, 55 tests. Login reviewed in browser.
+4a. Auth core: `auth.ts` (argon2 check, hashed sessions, per-IP rate limit), `db.ts` with migrations runner and sessions table, base64 `APP_PASSWORD_HASH` and `DATA_DIR` in config, `scripts/hash-password.ts`, 44 tests.
+4b. Auth wiring: `guard.ts` (Origin check, 401 for /api, else redirect), security headers, kit.csp, login page, POST /logout, 55 tests. Reviewed in browser.
+5. DB tables: migration 002 (decisions, daily_stats, settings), `recordDecision`/`removeDecision` transactions and read statements in `db.ts`, 65 tests.
 
 ## Open decisions
 
@@ -48,11 +47,11 @@
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
   name, path and domain come from constants, so not reachable. Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted in Immich.
-  The app now uses a fresh 8-permission key, verified live.
 - Not tested live: `addAssetsToAlbum`, and startup with server trash disabled
-  (covered by unit tests). Album and duplicate listing return 200 live.
-- Task 16: the build keeps better-sqlite3 and @node-rs/argon2 external, so the
-  image needs production node_modules. Set `ADDRESS_HEADER`/`XFF_DEPTH` to match
-  the real proxy (.env.example assumes one proxy with X-Forwarded-For).
+  (covered by unit tests).
+- Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2
+  are external). Set `ADDRESS_HEADER`/`XFF_DEPTH` to match the real proxy.
 - Login page is unstyled on purpose; restyle after task 8 (DESIGN.md).
-- Task 6 media fetch goes inside `immich.ts` (now 125 lines; split if it passes 200).
+- Task 6 media fetch goes inside `immich.ts` (125 lines; split if it passes 200).
+- Task 7: callers of `recordDecision` supply the local `day` (YYYY-MM-DD) and the
+  trashed asset's file size (`exifInfo.fileSizeInByte`, may be null).
