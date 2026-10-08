@@ -39,6 +39,8 @@ export async function checkServer(): Promise<void> {
 		);
 	}
 	await assertTrashEnabled();
+	// Version and features are public endpoints; this call proves the key works.
+	await getTimelineStats();
 	log.info('immich server ready', { version });
 }
 

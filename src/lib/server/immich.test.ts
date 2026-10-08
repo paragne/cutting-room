@@ -8,7 +8,8 @@ vi.mock('@immich/sdk', async (importOriginal) => ({
 	getServerVersion: vi.fn(),
 	getServerFeatures: vi.fn(),
 	searchAssets: vi.fn(),
-	deleteAssets: vi.fn()
+	deleteAssets: vi.fn(),
+	getAssetStatistics: vi.fn()
 }));
 vi.mock('./config', () => ({
 	getConfig: () => ({ immichUrl: 'http://immich.test', immichApiKey: 'test-key' })
@@ -20,6 +21,7 @@ const m = vi.mocked(sdk);
 function server(version: Partial<sdk.ServerVersionResponseDto>, trash: boolean): void {
 	m.getServerVersion.mockResolvedValue({ major: 3, minor: 2, patch: 0, prerelease: null, ...version });
 	m.getServerFeatures.mockResolvedValue({ trash } as sdk.ServerFeaturesDto);
+	m.getAssetStatistics.mockResolvedValue({ images: 0, videos: 0, total: 0 });
 }
 
 beforeEach(() => vi.clearAllMocks());
@@ -43,6 +45,12 @@ describe('checkServer', () => {
 	it('rejects when trash is disabled', async () => {
 		server({}, false);
 		await expect(checkServer()).rejects.toThrow(/trash is disabled/);
+	});
+
+	it('rejects when the API key is not accepted', async () => {
+		server({}, true);
+		m.getAssetStatistics.mockRejectedValue(new Error('401'));
+		await expect(checkServer()).rejects.toThrow('401');
 	});
 });
 
