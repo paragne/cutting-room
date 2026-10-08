@@ -1,0 +1,35 @@
+{
+	"name": "cutting-room",
+	"private": true,
+	"version": "0.0.1",
+	"license": "AGPL-3.0-only",
+	"type": "module",
+	"engines": {
+		"node": ">=24 <25"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && eslint . && vitest run",
+		"lint": "eslint .",
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"@eslint/js": "10.0.1",
+		"@sveltejs/adapter-node": "5.5.7",
+		"@sveltejs/kit": "2.70.3",
+		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/node": "24.19.1",
+		"eslint": "10.12.0",
+		"eslint-plugin-svelte": "3.23.0",
+		"globals": "17.13.0",
+		"svelte": "5.57.2",
+		"svelte-check": "4.7.6",
+		"typescript": "6.0.3",
+		"typescript-eslint": "8.71.1",
+		"vite": "8.3.4",
+		"vitest": "4.1.11"
+	}
+}
