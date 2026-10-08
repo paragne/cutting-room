@@ -2,13 +2,10 @@
 
 ## Current task
 
-6. Media proxy
+7. Queue and decisions API
 
 ## Tasks (one per session, in order)
 
-6. Media proxy: thumbnail, preview, video routes with UUID validation,
-   Range passthrough, header allowlist. Use fetch, not SDK Blob calls; no
-   fullsize, no redirect following. Tests with mocked Immich.
 7. Queue and decisions API: timeline mode (oldest, newest), excludes
    reviewed ids, keep, trash, undo (restore from trash). Keyset paging on
    takenAt, explicit trashedAt and visibility filters. Tests.
@@ -36,6 +33,7 @@
 4a. Auth core: `auth.ts` (argon2 check, hashed sessions, per-IP rate limit), `db.ts` with migrations runner and sessions table, base64 `APP_PASSWORD_HASH` and `DATA_DIR` in config, `scripts/hash-password.ts`, 44 tests.
 4b. Auth wiring: `guard.ts` (Origin check, 401 for /api, else redirect), security headers, kit.csp, login page, POST /logout, 55 tests. Reviewed in browser.
 5. DB tables: migration 002 (decisions, daily_stats, settings), `recordDecision`/`removeDecision` transactions and read statements in `db.ts`, 65 tests.
+6. Media proxy: `fetchMedia` in `immich.ts`, `media.ts`, route `/media/[id]/[kind]` (thumbnail, preview, video), 90 tests. Verified live with curl.
 
 ## Open decisions
 
@@ -52,6 +50,8 @@
 - Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2
   are external). Set `ADDRESS_HEADER`/`XFF_DEPTH` to match the real proxy.
 - Login page is unstyled on purpose; restyle after task 8 (DESIGN.md).
-- Task 6 media fetch goes inside `immich.ts` (125 lines; split if it passes 200).
+- `immich.ts` is 155 lines; split by responsibility if it passes 200.
+- Task 16: check the production build sends Strict-Transport-Security and no
+  `Vary: Origin` on media (seen in dev, likely from Vite).
 - Task 7: callers of `recordDecision` supply the local `day` (YYYY-MM-DD) and the
   trashed asset's file size (`exifInfo.fileSizeInByte`, may be null).

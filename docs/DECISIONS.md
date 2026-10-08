@@ -37,3 +37,6 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: daily_stats counters are updated in the same transaction as decisions, so home screen stats and streak never scan the decisions table.
 - 2026-10-08: Trashed file size is stored on the decision at trash time, so "space trashed" needs no Immich call per asset.
 - 2026-10-08: The decision's day is passed in by the caller and stored on the row, so undo decrements the day it was counted on, not today.
+- 2026-10-08: Media is one route, /media/[id]/[kind], with kind checked against thumbnail, preview, video. Unknown kinds (fullsize, original) return 404 before any Immich call.
+- 2026-10-08: Media fetch uses redirect: 'error' and Accept-Encoding: identity. Fullsize redirects to the original, and decompression would make the passed Content-Length wrong.
+- 2026-10-08: Only one bytes= range is forwarded; anything else is dropped and the full file served. Immich 404 maps to 404; other errors and non-image/video bodies map to an empty 502.
