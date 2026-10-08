@@ -14,8 +14,10 @@
   ],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/node/.claude",
-    "HOST_HOME": "${localEnv:HOME}"
+    "HOST_HOME": "${localEnv:HOME}",
+    "NPM_CONFIG_UPDATE_NOTIFIER": "false"
   },
+  "initializeCommand": "git config --global user.name > .devcontainer/.git-identity && git config --global user.email >> .devcontainer/.git-identity",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "forwardPorts": [5173],
   "customizations": {

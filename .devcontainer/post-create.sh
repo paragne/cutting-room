@@ -9,6 +9,14 @@ cd "$(dirname "$0")/.."
 sudo chown node:node /home/node/.claude
 [ -e /home/node/.claude/settings.json ] && sudo chown node:node /home/node/.claude/settings.json
 
+# Git identity, written on the host by initializeCommand (gitignored file).
+if [ -s .devcontainer/.git-identity ]; then
+  git config --global user.name "$(sed -n 1p .devcontainer/.git-identity)"
+  git config --global user.email "$(sed -n 2p .devcontainer/.git-identity)"
+else
+  echo "WARNING: no .devcontainer/.git-identity; set git user.name and user.email on the host"
+fi
+
 IMPECCABLE_VERSION="4.1.0"
 SKILLS_CLI_VERSION="1.7.1"
 

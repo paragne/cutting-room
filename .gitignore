@@ -20,3 +20,5 @@
 .claude/skills/
 .claude/agents/
 .claude/settings.local.json
+
+.devcontainer/.git-identity
