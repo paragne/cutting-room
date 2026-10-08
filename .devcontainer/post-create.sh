@@ -4,6 +4,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Docker creates the config volume and the parent dirs of the nested bind
+# mounts as root. Hand the directory (not the read-only mounts) to node.
+sudo chown node:node /home/node/.claude
+[ -e /home/node/.claude/settings.json ] && sudo chown node:node /home/node/.claude/settings.json
+
 IMPECCABLE_VERSION="4.1.0"
 SKILLS_CLI_VERSION="1.7.1"
 
