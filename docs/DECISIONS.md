@@ -15,3 +15,6 @@ Append only. One line per decision, with the reason.
 - 2026-10-07: Project named cutting-room. Film term for where rejected footage goes; "sift" collided with an existing self-hosted app.
 - 2026-10-07: Impeccable skill files are gitignored and installed per container. Third-party code, 18 MB binary, not ours to vendor.
 - 2026-10-08: Stay on SvelteKit 2 (2.70.3) for now. Stack specifies it; Kit 3 was one week old at scaffold time.
+- 2026-10-08: Pin Immich server v3.2.0 and @immich/sdk 3.2.0 exactly. SDK must match server; bump together.
+- 2026-10-08: Check server trash enabled before every trash call, not only at startup. With trash disabled, non-force deletes are purged at the next nightly job.
+- 2026-10-08: Never call resolveDuplicates. It force-deletes when trash is disabled; Compare trashes with deleteAssets instead.
