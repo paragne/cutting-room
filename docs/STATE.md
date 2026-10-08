@@ -2,15 +2,13 @@
 
 ## Current task
 
-4a. Auth core
+4b. Auth wiring
 
 ## Tasks (one per session, in order)
 
-4a. Auth core: argon2id password hash from env, sessions in SQLite (minimal
-   `db.ts` and migrations runner, sessions table only), login rate limit,
-   `scripts/hash-password.ts`. Tests.
 4b. Auth wiring: hooks guard, Origin check on non-GET, security headers and
-   CSP, login page, logout. I review the login page running.
+   CSP, login page, logout. Uses `auth.ts` and `getDb()` from 4a. I review
+   the login page running.
 5. DB: tables for decisions, daily stats, settings on the runner from 4a.
    Prepared statements only. Tests on an in-memory DB.
 6. Media proxy: thumbnail, preview, video routes with UUID validation,
@@ -40,6 +38,7 @@
 1. Scaffold: SvelteKit 2.70.3, adapter-node 5.5.7, TS strict, eslint, vitest, `npm run check` passing.
 2. Immich API spike: server v3.2.0 and @immich/sdk 3.2.0 pinned, docs/IMMICH-API.md written, trash/restore verified live.
 3. Config and Immich client: `config.ts`, `log.ts`, `immich.ts`, startup check in `hooks.server.ts` `init` (version, trash, key), 26 tests. Verified live.
+4a. Auth core: `auth.ts` (argon2 check, hashed sessions, per-IP rate limit), `db.ts` with migrations runner and sessions table, base64 `APP_PASSWORD_HASH` and `DATA_DIR` in config, `scripts/hash-password.ts`, 44 tests. Dev server starts with real hash.
 
 ## Open decisions
 
@@ -54,4 +53,8 @@
   The app now uses a fresh 8-permission key, verified live.
 - Not tested live: `addAssetsToAlbum`, and startup with server trash disabled
   (covered by unit tests). Album and duplicate listing return 200 live.
+- 4b: confirm `npm run build` bundles the migration SQL and native modules
+  once a route imports `db.ts` (tree-shaken out until then).
+- 4b: set adapter-node `ADDRESS_HEADER`/`XFF_DEPTH` for the reverse proxy, or
+  the rate limit sees only the proxy IP. Dev `ORIGIN` is http://localhost:5173.
 - Task 6 media fetch goes inside `immich.ts` (now 125 lines; split if it passes 200).

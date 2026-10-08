@@ -28,3 +28,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: Session tokens are 32 random bytes, stored as SHA-256 only, absolute 30-day expiry. No sliding renewal; one user re-logs monthly.
 - 2026-10-08: Login rate limit is in memory, per IP, 5 failures per 15 minutes. Restart resets it, which gains an attacker nothing over waiting.
 - 2026-10-08: Migrations are bundled with import.meta.glob and tracked with PRAGMA user_version. No migrations table, no files read at runtime.
+- 2026-10-08: Dev server binds 127.0.0.1, not the default IPv6 loopback, so VS Code port forwarding reaches it. Never bound to the LAN.
