@@ -3,6 +3,8 @@ import { env } from '$env/dynamic/private';
 export type Config = {
 	immichUrl: string;
 	immichApiKey: string;
+	appPasswordHash: string;
+	dataDir: string;
 };
 
 export class ConfigError extends Error {
@@ -13,7 +15,9 @@ export class ConfigError extends Error {
 export function parseConfig(source: Record<string, string | undefined>): Config {
 	return {
 		immichUrl: parseImmichUrl(source.IMMICH_URL),
-		immichApiKey: parseApiKey(source.IMMICH_API_KEY)
+		immichApiKey: parseApiKey(source.IMMICH_API_KEY),
+		appPasswordHash: parsePasswordHash(source.APP_PASSWORD_HASH),
+		dataDir: source.DATA_DIR || 'data'
 	};
 }
 
@@ -44,6 +48,22 @@ function parseApiKey(raw: string | undefined): string {
 		throw new ConfigError('IMMICH_API_KEY is still the .env.example placeholder');
 	}
 	return raw;
+}
+
+const ARGON2ID_PHC = /^\$argon2id\$v=19\$m=\d+,t=\d+,p=\d+\$[A-Za-z0-9+/]+\$[A-Za-z0-9+/]+$/;
+
+// Base64 of the PHC string. A raw hash is full of `$`, which Vite's .env loader
+// and Docker Compose both treat as variable references and silently mangle.
+function parsePasswordHash(raw: string | undefined): string {
+	if (!raw) throw new ConfigError('APP_PASSWORD_HASH is not set');
+	if (raw.startsWith('replace-with')) {
+		throw new ConfigError('APP_PASSWORD_HASH is still the .env.example placeholder');
+	}
+	const phc = Buffer.from(raw, 'base64').toString('utf8');
+	if (!ARGON2ID_PHC.test(phc)) {
+		throw new ConfigError('APP_PASSWORD_HASH is not output of scripts/hash-password.ts');
+	}
+	return phc;
 }
 
 let cached: Config | undefined;
