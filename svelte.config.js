@@ -8,7 +8,25 @@ const config = {
 		runes: true
 	},
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		// Kit adds nonces for its own inline scripts and styles, and 'unsafe-inline' for styles in dev.
+		csp: {
+			mode: 'auto',
+			directives: {
+				'default-src': ['none'],
+				'script-src': ['self'],
+				'style-src': ['self'],
+				'img-src': ['self', 'blob:'],
+				'media-src': ['self', 'blob:'],
+				'font-src': ['self'],
+				'connect-src': ['self'],
+				'manifest-src': ['self'],
+				'form-action': ['self'],
+				'base-uri': ['none'],
+				'frame-ancestors': ['none'],
+				'object-src': ['none']
+			}
+		}
 	}
 };
 

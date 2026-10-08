@@ -3,6 +3,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { getConfig } from './config';
 import type { Db } from './db';
 
+export const SESSION_COOKIE = 'session';
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 export const LOGIN_MAX_FAILURES = 5;
 export const LOGIN_WINDOW_MS = 15 * 60 * 1000;
