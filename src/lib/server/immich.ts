@@ -81,9 +81,15 @@ export async function searchRandom(query: {
 	});
 }
 
-export async function getAsset(id: string): Promise<AssetResponseDto> {
+// Immich answers an unknown or inaccessible id with 400 or 404.
+export async function getAsset(id: string): Promise<AssetResponseDto | null> {
 	connect();
-	return sdk.getAssetInfo({ id });
+	try {
+		return await sdk.getAssetInfo({ id });
+	} catch (err) {
+		if (sdk.isHttpError(err) && (err.status === 400 || err.status === 404)) return null;
+		throw err;
+	}
 }
 
 export async function getTimelineStats(): Promise<AssetStatsResponseDto> {

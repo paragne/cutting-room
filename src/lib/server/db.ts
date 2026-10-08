@@ -80,6 +80,10 @@ export function openDb(path: string) {
 			countDay(previous, -1);
 			return previous;
 		}),
+		// Takes a JSON array of ids, so one statement serves any batch size.
+		reviewedAmong: db.prepare<[string], { assetId: string }>(
+			'SELECT asset_id AS assetId FROM decisions WHERE asset_id IN (SELECT value FROM json_each(?))'
+		),
 		countDecisions: db.prepare<[], { count: number }>('SELECT count(*) AS count FROM decisions'),
 		statTotals: db.prepare<[], { kept: number; trashed: number; bytesTrashed: number }>(
 			`SELECT coalesce(sum(kept), 0) AS kept, coalesce(sum(trashed), 0) AS trashed,
