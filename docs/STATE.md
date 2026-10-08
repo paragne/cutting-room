@@ -2,15 +2,10 @@
 
 ## Current task
 
-3. Config and Immich client
+4. Auth
 
 ## Tasks (one per session, in order)
 
-3. Config and Immich client: `config.ts` env validation (fail fast),
-   `immich.ts` wrapper exposing only the calls from IMMICH-API.md, startup
-   check for server version (3.2.0) and trash enabled, trash check before
-   every trash call, `log.ts`. Unit tests.
-   Remove `passWithNoTests` from vite.config.ts once tests exist.
 4. Auth: argon2id password hash from env, login page, sessions in SQLite,
    hooks guard, Origin check on non-GET, security headers and CSP, login
    rate limit. `scripts/hash-password.ts`. Tests.
@@ -42,6 +37,7 @@
 
 1. Scaffold: SvelteKit 2.70.3, adapter-node 5.5.7, TS strict, eslint, vitest, `npm run check` passing.
 2. Immich API spike: server v3.2.0 and @immich/sdk 3.2.0 pinned, docs/IMMICH-API.md written, trash/restore verified live.
+3. Config and Immich client: `config.ts`, `log.ts`, `immich.ts`, startup check in `hooks.server.ts` `init` (version, trash, key), 26 tests. Verified live.
 
 ## Open decisions
 
@@ -52,7 +48,8 @@
 
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
   name, path and domain come from constants, so not reachable. Fixed only by Kit 3.
-- Spike API key was pasted in chat and is over-privileged (library.*,
-  asset.download). Replace it with a key holding only the 8 permissions
-  listed in IMMICH-API.md before task 3 runs against the server.
-- Album and duplicate calls not yet tested live (test key lacked permissions).
+- Spike key (over-privileged, pasted in chat): confirm it is deleted in Immich.
+  The app now uses a fresh 8-permission key, verified live.
+- Not tested live: `addAssetsToAlbum`, and startup with server trash disabled
+  (covered by unit tests). Album and duplicate listing return 200 live.
+- Task 6 media fetch goes inside `immich.ts` (now 125 lines; split if it passes 200).
