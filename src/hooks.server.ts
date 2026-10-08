@@ -15,7 +15,9 @@ export const init: ServerInit = async () => {
 const SECURITY_HEADERS: Record<string, string> = {
 	'X-Content-Type-Options': 'nosniff',
 	'X-Frame-Options': 'DENY',
-	'Referrer-Policy': 'no-referrer',
+	// Not no-referrer: under that policy browsers send `Origin: null` on same-origin form
+	// posts, and the Origin check then refuses every login.
+	'Referrer-Policy': 'same-origin',
 	'Cross-Origin-Opener-Policy': 'same-origin',
 	'Cross-Origin-Resource-Policy': 'same-origin',
 	'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
