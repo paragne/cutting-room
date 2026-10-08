@@ -29,3 +29,7 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: Login rate limit is in memory, per IP, 5 failures per 15 minutes. Restart resets it, which gains an attacker nothing over waiting.
 - 2026-10-08: Migrations are bundled with import.meta.glob and tracked with PRAGMA user_version. No migrations table, no files read at runtime.
 - 2026-10-08: Dev server binds 127.0.0.1, not the default IPv6 loopback, so VS Code port forwarding reaches it. Never bound to the LAN.
+- 2026-10-08: Origin check covers every method except GET and HEAD, and a missing Origin is refused. Kit's built-in check only covers form content types.
+- 2026-10-08: Referrer-Policy is same-origin, not no-referrer. Under no-referrer browsers send `Origin: null` on same-origin form posts, which the Origin check refuses.
+- 2026-10-08: CSP via kit.csp in auto mode, so Kit adds nonces for its own inline scripts. Other headers are set in the handle hook, which returns refusals as responses so they get the headers too.
+- 2026-10-08: Unauthenticated /api requests get 401 JSON; other paths redirect to /login. A fetch caller can't use a redirect to a login page.
