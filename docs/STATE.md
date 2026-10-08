@@ -2,13 +2,10 @@
 
 ## Current task
 
-1. Scaffold
+2. Immich API spike
 
 ## Tasks (one per session, in order)
 
-1. Scaffold: SvelteKit 2 + Svelte 5 + adapter-node, TS strict, ESLint,
-   svelte-check, Vitest, `npm run check`. `.npmrc` with save-exact, `.nvmrc`
-   (24), `.gitignore` (.env, data/, build/), `.env.example`, AGPL-3.0 LICENSE.
 2. Immich API spike: pin Immich server and @immich/sdk versions. Write
    docs/IMMICH-API.md mapping every action (list, random, metadata search,
    date range, trash, restore, favorite, albums, duplicates, thumbnail,
@@ -17,6 +14,7 @@
 3. Config and Immich client: `config.ts` env validation (fail fast),
    `immich.ts` wrapper exposing only the calls from IMMICH-API.md, startup
    check for server version and trash enabled, `log.ts`. Unit tests.
+   Remove `passWithNoTests` from vite.config.ts once tests exist.
 4. Auth: argon2id password hash from env, login page, sessions in SQLite,
    hooks guard, Origin check on non-GET, security headers and CSP, login
    rate limit. `scripts/hash-password.ts`. Tests.
@@ -43,12 +41,14 @@
 
 ## Done
 
-Nothing yet.
+1. Scaffold: SvelteKit 2.70.3, adapter-node 5.5.7, TS strict, eslint, vitest, `npm run check` passing.
 
 ## Open decisions
 
 - Shuffle mode efficiency once most of the library is reviewed.
+- SvelteKit 3 (released 2026-10-01): stay on 2 or migrate.
 
 ## Known issues
 
-None yet.
+- `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
+  name, path and domain come from constants, so not reachable. Fixed only by Kit 3.

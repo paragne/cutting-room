@@ -14,3 +14,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-07: On this day uses date-range search per past year instead of Immich memories. Works even if memory generation is off.
 - 2026-10-07: Project named cutting-room. Film term for where rejected footage goes; "sift" collided with an existing self-hosted app.
 - 2026-10-07: Impeccable skill files are gitignored and installed per container. Third-party code, 18 MB binary, not ours to vendor.
+- 2026-10-08: Stay on SvelteKit 2 (2.70.3) for now. Stack specifies it; Kit 3 was one week old at scaffold time.
