@@ -40,3 +40,9 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: Media is one route, /media/[id]/[kind], with kind checked against thumbnail, preview, video. Unknown kinds (fullsize, original) return 404 before any Immich call.
 - 2026-10-08: Media fetch uses redirect: 'error' and Accept-Encoding: identity. Fullsize redirects to the original, and decompression would make the passed Content-Length wrong.
 - 2026-10-08: Only one bytes= range is forwarded; anything else is dropped and the full file served. Immich 404 maps to 404; other errors and non-image/video bodies map to an empty 502.
+- 2026-10-08: Queue cursor is the last takenAt plus the ids already passed at that time, queried with gte (asc) or lt t+1ms (desc). Offset paging skips assets after trashing, takenAt alone skips or repeats ties, and the API truncates times to ms.
+- 2026-10-08: Reviewed assets are dropped from Immich results locally against the decisions table, fetching 200 per search for a page of 20. Immich cannot filter by our ids.
+- 2026-10-08: Deciding on an asset that already has a decision returns 409; undo first. Re-deciding a trashed asset as keep would leave it in Immich trash.
+- 2026-10-08: The client sends its local day; the server accepts it only within one day of its UTC date. Any real time zone falls inside that.
+- 2026-10-08: Trash calls Immich before writing the decision, and undo restores before deleting it, so an Immich failure leaves the DB unchanged. Undo with restore count 0 returns 409 and keeps the decision.
+- 2026-10-08: `getAsset` returns null on Immich 400 or 404 (verified live), so Immich error handling stays inside `immich.ts`.
