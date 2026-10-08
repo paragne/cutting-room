@@ -22,3 +22,5 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: Startup check runs in the hooks.server.ts `init` hook, skipped when building. In production a bad config exits the process before it listens.
 - 2026-10-08: immich.ts search wrappers always set trashedAt null and timeline visibility, and do not accept `or`. Callers cannot widen the filter.
 - 2026-10-08: Startup check makes one authenticated call (asset statistics). Version and features are public, so they do not prove the key works.
+- 2026-10-08: Split task 4 into 4a (core) and 4b (wiring). Sessions need SQLite, so 4a brings a minimal migrations runner forward from task 5.
+- 2026-10-08: Deny better-sqlite3 install script via allowScripts. It ships prebuilds for linux glibc and musl; the script only runs node-gyp when none match.

@@ -2,15 +2,17 @@
 
 ## Current task
 
-4. Auth
+4a. Auth core
 
 ## Tasks (one per session, in order)
 
-4. Auth: argon2id password hash from env, login page, sessions in SQLite,
-   hooks guard, Origin check on non-GET, security headers and CSP, login
-   rate limit. `scripts/hash-password.ts`. Tests.
-5. DB: migrations runner, tables for decisions, daily stats, settings.
-   `db.ts` with prepared statements only. Tests on an in-memory DB.
+4a. Auth core: argon2id password hash from env, sessions in SQLite (minimal
+   `db.ts` and migrations runner, sessions table only), login rate limit,
+   `scripts/hash-password.ts`. Tests.
+4b. Auth wiring: hooks guard, Origin check on non-GET, security headers and
+   CSP, login page, logout. I review the login page running.
+5. DB: tables for decisions, daily stats, settings on the runner from 4a.
+   Prepared statements only. Tests on an in-memory DB.
 6. Media proxy: thumbnail, preview, video routes with UUID validation,
    Range passthrough, header allowlist. Use fetch, not SDK Blob calls; no
    fullsize, no redirect following. Tests with mocked Immich.
