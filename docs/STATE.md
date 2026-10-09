@@ -1,7 +1,6 @@
 # State
 
 ## Current task
-
 9c. Restyle login to match (see task list).
 
 ## Tasks (one per session, in order)
