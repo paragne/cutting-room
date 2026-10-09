@@ -50,3 +50,5 @@ Append only. One line per decision, with the reason.
 - 2026-10-09: DESIGN.md is written now as a seed and regenerated from the built swipe screen at the end of task 9. A spec written before code drifts from it.
 - 2026-10-09: Shuffle all is the default mode; photoshoot shuffle is a separate mode. Users said random feed is the core loop.
 - 2026-10-09: UI copy is playful, but buttons stay literal (Trash, Undo, Keep) so a destructive action is never ambiguous.
+- 2026-10-09: The deck moves only after the server confirms a decide or undo, and blocks input meanwhile. Optimistic advance would need rollback across several in-flight requests; one Immich trash call on the LAN is short enough to hide behind the swipe animation.
+- 2026-10-09: Swipe release decides on 30% of card width, or a fling of 0.5 px/ms from at least 24px, measured over the last 80ms. Starting values, tuned in 9b.
