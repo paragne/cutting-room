@@ -36,13 +36,11 @@
 7. Queue and decisions API: `queue.ts` (keyset cursor), `decide.ts`, GET /api/queue, POST /api/decide, POST /api/undo, 143 tests. Verified live with curl.
 8. Design: PRODUCT.md, seed DESIGN.md (edit suite at 2am), swipe screen brief in `.impeccable/surfaces/`.
 9a. Swipe logic: `swipe.ts` (release rule, velocity), `deck.svelte.ts` (Deck class: current, upcoming 3, refill, undo history), `api.ts` client wrappers, 164 tests. No UI.
-
 ## Open decisions
 
 - Shuffle mode efficiency once most of the library is reviewed.
 - Photoshoot detection: time gap, location, or Immich data.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
-
 ## Known issues
 
 - 9b: Deck shows a 401 (expired session) as an error message; the screen must
@@ -50,7 +48,7 @@
 
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
   name, path and domain come from constants, so not reachable. Fixed only by Kit 3.
-- Spike key (over-privileged, pasted in chat): confirm it is deleted in Immich.
+- Spike key (over-privileged, pasted in chat): confirm it is deleted.
 - Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
 - Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2),
   `ADDRESS_HEADER`/`XFF_DEPTH` for the real proxy, and a check for HSTS and no
