@@ -2,16 +2,18 @@
 
 ## Current task
 
-8. Design: run /impeccable init (PRODUCT.md) and write DESIGN.md. No code.
+9. Swipe screen (see task list).
 
 ## Tasks (one per session, in order)
 
-8. Design: run /impeccable init (PRODUCT.md) and write DESIGN.md. No code.
 9. Swipe screen: card stack, pointer drag with fling threshold, keep and
    trash buttons, arrow keys, Ctrl+Z, preload next 3. I review it running.
+   Follow .impeccable/surfaces/ brief, restyle login, then regenerate DESIGN.md.
 10. Video playback in card, double-tap and F to favorite. I review.
 11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
-12. Modes: shuffle, on this day (date range per past year), single album.
+12. Modes: shuffle all (the default), on this day (date range per past
+    year), single album.
+12b. Photoshoot shuffle: random burst, pick the best, trash the rest.
 13. Home screen: mode picker, percent sorted, space trashed, streak. I review.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
     with deleteAssets (never resolveDuplicates).
@@ -32,10 +34,12 @@
 5. DB tables: migration 002 (decisions, daily_stats, settings), `recordDecision`/`removeDecision` transactions and read statements in `db.ts`, 65 tests.
 6. Media proxy: `fetchMedia` in `immich.ts`, `media.ts`, route `/media/[id]/[kind]` (thumbnail, preview, video), 90 tests. Verified live with curl.
 7. Queue and decisions API: `queue.ts` (keyset cursor), `decide.ts`, GET /api/queue, POST /api/decide, POST /api/undo, 143 tests. Verified live with curl.
+8. Design: PRODUCT.md, seed DESIGN.md (edit suite at 2am), swipe screen brief in `.impeccable/surfaces/`.
 
 ## Open decisions
 
 - Shuffle mode efficiency once most of the library is reviewed.
+- Photoshoot detection: time gap, location, or Immich data.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 
 ## Known issues
@@ -45,14 +49,12 @@
 - Spike key (over-privileged, pasted in chat): confirm it is deleted in Immich.
 - Not tested live: `addAssetsToAlbum`, and startup with server trash disabled
   (covered by unit tests).
-- Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2
-  are external). Set `ADDRESS_HEADER`/`XFF_DEPTH` to match the real proxy.
-- Login page is unstyled on purpose; restyle after task 8 (DESIGN.md).
+- Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2),
+  `ADDRESS_HEADER`/`XFF_DEPTH` for the real proxy, and a check for HSTS and no
+  `Vary: Origin` on media (seen in dev, likely Vite).
 - `immich.ts` is 161 lines; split by responsibility if it passes 200.
-- Task 16: check the production build sends Strict-Transport-Security and no
-  `Vary: Origin` on media (seen in dev, likely from Vite).
 - Migrations runner tracks only `user_version`, so a DB built from an edited
   migration keeps the old schema. Delete `data/` after any pre-commit migration edit.
-- Queue: a first page after a long reviewed run costs one Immich search per 200
-  reviewed assets. Fine for now; revisit with shuffle in task 12.
+- Queue is date ordered; shuffle all is the default (task 12). A first page after
+  a long reviewed run costs one Immich search per 200 reviewed assets.
 - Queue cursor allows at most 500 assets sharing one timestamp (Immich search size cap).

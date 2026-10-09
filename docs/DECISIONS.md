@@ -46,3 +46,7 @@ Append only. One line per decision, with the reason.
 - 2026-10-08: The client sends its local day; the server accepts it only within one day of its UTC date. Any real time zone falls inside that.
 - 2026-10-08: Trash calls Immich before writing the decision, and undo restores before deleting it, so an Immich failure leaves the DB unchanged. Undo with restore count 0 returns 409 and keeps the decision.
 - 2026-10-08: `getAsset` returns null on Immich 400 or 404 (verified live), so Immich error handling stays inside `immich.ts`.
+- 2026-10-09: Visual world is "the edit suite at 2am" (dark NLE panels, amber timecode, session timeline as the signature move), pinned by the user over the rolled directions. Controls stay standard web controls so it never becomes a costume of an editor.
+- 2026-10-09: DESIGN.md is written now as a seed and regenerated from the built swipe screen at the end of task 9. A spec written before code drifts from it.
+- 2026-10-09: Shuffle all is the default mode; photoshoot shuffle is a separate mode. Users said random feed is the core loop.
+- 2026-10-09: UI copy is playful, but buttons stay literal (Trash, Undo, Keep) so a destructive action is never ambiguous.
