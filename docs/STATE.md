@@ -2,13 +2,16 @@
 
 ## Current task
 
-9. Swipe screen (see task list).
+9a. Swipe logic (see task list).
 
 ## Tasks (one per session, in order)
 
-9. Swipe screen: card stack, pointer drag with fling threshold, keep and
-   trash buttons, arrow keys, Ctrl+Z, preload next 3. I review it running.
-   Follow .impeccable/surfaces/ brief, restyle login, then regenerate DESIGN.md.
+9a. Swipe logic: pure release rule (drag distance, fling velocity) and the
+    deck (current card, next 3 to preload, page refill, undo history), with
+    tests. Client API wrapper. No UI.
+9b. Swipe screen UI: card stack, pointer drag, Trash/Undo/Keep buttons, arrow
+    keys, Ctrl+Z, preload next 3. Follow .impeccable/surfaces/ brief. I review.
+9c. Restyle login to match, then regenerate DESIGN.md from the built screen.
 10. Video playback in card, double-tap and F to favorite. I review.
 11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
 12. Modes: shuffle all (the default), on this day (date range per past
