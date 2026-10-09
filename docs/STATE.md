@@ -3,7 +3,6 @@
 ## Current task
 
 9b. Swipe screen UI (see task list).
-
 ## Tasks (one per session, in order)
 
 9b. Swipe screen UI: card stack, pointer drag, Trash/Undo/Keep buttons, arrow
@@ -23,7 +22,6 @@
     read-only rootfs, /data volume, healthcheck, compose example. Dependabot.
 17. PWA manifest and icons for home-screen install. No media caching.
 18. README (written by me).
-
 ## Done
 
 1. Scaffold: SvelteKit 2.70.3, adapter-node 5.5.7, TS strict, eslint, vitest, `npm run check` passing.
