@@ -19,6 +19,7 @@
   },
   "initializeCommand": "git config --global user.name > .devcontainer/.git-identity && git config --global user.email >> .devcontainer/.git-identity",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "shutdownAction": "none",
   "forwardPorts": [5173],
   "customizations": {
     "vscode": {
