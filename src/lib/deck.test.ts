@@ -1,6 +1,6 @@
 import { AssetTypeEnum } from '@immich/sdk';
 import { describe, expect, it, vi } from 'vitest';
-import { localDay } from './api';
+import { localDay, Unauthorized } from './api';
 import { Deck, type DeckApi, type Page } from './deck.svelte';
 import type { QueueItem } from './server/queue';
 
@@ -19,7 +19,9 @@ function items(from: number, count: number): QueueItem[] {
 }
 
 // Serves the given pages in order; the last page's cursor is null.
-function fakeApi(pages: QueueItem[][]): DeckApi & { page: ReturnType<typeof vi.fn> } {
+function fakeApi(pages: QueueItem[][]): {
+	[K in keyof DeckApi]: DeckApi[K] & ReturnType<typeof vi.fn>;
+} {
 	return {
 		page: vi.fn(async (cursor: string | null): Promise<Page> => {
 			const i = cursor === null ? 0 : Number(cursor);
@@ -146,6 +148,17 @@ describe('Deck', () => {
 		await Promise.all([deck.decide('keep'), deck.decide('keep')]);
 		expect(api.decide).toHaveBeenCalledTimes(1);
 		expect(deck.current).toEqual(item(1));
+	});
+
+	it('flags an expired session without an error message', async () => {
+		const api = fakeApi([items(0, 20)]);
+		const deck = new Deck(api);
+		await deck.refill();
+		api.decide.mockRejectedValue(new Unauthorized());
+		await deck.decide('keep');
+		expect(deck.expired).toBe(true);
+		expect(deck.error).toBeNull();
+		expect(deck.current).toEqual(item(0));
 	});
 });
 

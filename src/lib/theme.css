@@ -1,0 +1,23 @@
+:root {
+	--ground: #1e1e1e;
+	--panel: #262626;
+	--panel-raised: #2e2e2e;
+	--hairline: #3a3a3a;
+	--matte: #0b0b0b;
+	--text: #d6d6d6;
+	--text-dim: #8c8c8c;
+	--amber: #e5a93b;
+	--keep: #6faf7a;
+	--cut: #d35a45;
+	color-scheme: dark;
+}
+body {
+	margin: 0;
+	background: var(--ground);
+	color: var(--text);
+	font: 15px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+:focus-visible {
+	outline: 2px solid var(--amber);
+	outline-offset: 2px;
+}

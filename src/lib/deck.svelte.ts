@@ -1,3 +1,4 @@
+import { Unauthorized } from './api';
 import type { Action } from './server/db';
 import type { QueueItem } from './server/queue';
 
@@ -29,6 +30,8 @@ export class Deck {
 	history = $state<Cut[]>([]);
 	busy = $state(false);
 	error = $state<string | null>(null);
+	/** The session ended; the screen sends the user to /login. */
+	expired = $state(false);
 	#cards = $state<QueueItem[]>([]);
 	#exhausted = $state(false);
 	#cursor: string | null = null;
@@ -99,6 +102,10 @@ export class Deck {
 		try {
 			await fn();
 		} catch (e) {
+			if (e instanceof Unauthorized) {
+				this.expired = true;
+				return;
+			}
 			this.error = e instanceof Error ? e.message : String(e);
 		}
 	}

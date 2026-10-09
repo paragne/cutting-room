@@ -1,9 +1,17 @@
 import type { Page } from './deck.svelte';
+import type { AssetInfo } from './server/assetInfo';
 import type { Action } from './server/db';
+
+export class Unauthorized extends Error {
+	constructor() {
+		super('session expired');
+	}
+}
 
 async function send(path: string, init?: RequestInit): Promise<Response> {
 	const res = await fetch(path, init);
 	if (res.ok) return res;
+	if (res.status === 401) throw new Unauthorized();
 	const { message } = (await res.json().catch(() => ({}))) as { message?: string };
 	throw new Error(message ?? `request failed (${res.status})`);
 }
@@ -33,4 +41,8 @@ export async function decide(id: string, action: Action): Promise<void> {
 
 export async function undo(id: string): Promise<void> {
 	await post('/api/undo', { id });
+}
+
+export async function assetInfo(id: string): Promise<AssetInfo> {
+	return (await send(`/api/asset/${id}`)).json() as Promise<AssetInfo>;
 }
