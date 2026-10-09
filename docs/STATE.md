@@ -51,14 +51,12 @@
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
   name, path and domain come from constants, so not reachable. Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted in Immich.
-- Not tested live: `addAssetsToAlbum`, and startup with server trash disabled
-  (covered by unit tests).
+- Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
 - Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2),
   `ADDRESS_HEADER`/`XFF_DEPTH` for the real proxy, and a check for HSTS and no
   `Vary: Origin` on media (seen in dev, likely Vite).
-- `immich.ts` is 161 lines; split by responsibility if it passes 200.
 - Migrations runner tracks only `user_version`, so a DB built from an edited
   migration keeps the old schema. Delete `data/` after any pre-commit migration edit.
-- Queue is date ordered; shuffle all is the default (task 12). A first page after
-  a long reviewed run costs one Immich search per 200 reviewed assets.
-- Queue cursor allows at most 500 assets sharing one timestamp (Immich search size cap).
+- Queue is date ordered until task 12. A first page after a long reviewed run
+  costs one Immich search per 200 reviewed assets. Cursor allows at most 500
+  assets sharing one timestamp.
