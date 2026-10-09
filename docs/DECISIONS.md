@@ -52,3 +52,6 @@ Append only. One line per decision, with the reason.
 - 2026-10-09: UI copy is playful, but buttons stay literal (Trash, Undo, Keep) so a destructive action is never ambiguous.
 - 2026-10-09: The deck moves only after the server confirms a decide or undo, and blocks input meanwhile. Optimistic advance would need rollback across several in-flight requests; one Immich trash call on the LAN is short enough to hide behind the swipe animation.
 - 2026-10-09: Swipe release decides on 30% of card width, or a fling of 0.5 px/ms from at least 24px, measured over the last 80ms. Starting values, tuned in 9b.
+- 2026-10-09: Asset details come from a separate `GET /api/asset/[id]` fetched only while the Details panel is open, returning six chosen fields. Putting them in the queue DTO would cost an Immich `getAssetInfo` per queued asset.
+- 2026-10-09: Card styles set transforms through the `style:` directive (CSSOM), not inline style attributes, because `style-src 'self'` blocks the latter.
+- 2026-10-09: Keep and trash timeline blocks share one shape and differ by color only, at the user's request.
