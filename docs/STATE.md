@@ -1,16 +1,15 @@
 # State
 
 ## Current task
-10b. GIFs autoplay and loop in the card (reported broken). Then 10c share.
+10c. Share button.
 
 ## Tasks (one per session, in order)
 
-10b. GIFs: broken in the app today. Must autoplay and loop in the card. Check
-    what the preview proxy serves for a GIF (Immich may send a still frame).
 10c. Share button: prepare the original photo or video. Desktop downloads it,
     mobile opens the share sheet (navigator.share with files, needs HTTPS).
-    Needs an `original` kind in the media proxy (never `fullsize`, see immich.ts)
-    and a check that the API key may download originals.
+    The `original` media kind exists (10b) and the key has asset.download.
+    Check large videos stream through it with Range, and that the share sheet
+    works over HTTPS.
 11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
 12. Modes: shuffle all (the default), on this day (date range per past
     year), single album.
@@ -38,6 +37,9 @@
 9c. Login restyled with theme tokens, DESIGN.md regenerated from the built screens.
 
 10. Video in card (autoplay, muted, loop, Sound toggle), double-tap and F favorite and advance. Migration 003, 191 tests. Reviewed in browser.
+
+10b. GIFs play from the `original` kind (previews are stills). `QueueItem.isGif`
+    from `originalMimeType`. Key now has asset.download, documented. 194 tests. Confirmed in browser.
 
 ## Open decisions
 
