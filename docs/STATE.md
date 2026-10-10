@@ -1,12 +1,10 @@
 # State
 
 ## Current task
-12. Modes: shuffle all (the default), on this day, single album.
+12b. Photoshoot shuffle: random burst, pick the best, trash the rest.
 
 ## Tasks (one per session, in order)
 
-12. Modes: shuffle all (the default), on this day (date range per past
-    year), single album.
 12b. Photoshoot shuffle: random burst, pick the best, trash the rest.
 13. Home screen: mode picker, percent sorted, space trashed, streak. I review.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
@@ -31,10 +29,11 @@
 10b. GIFs play from `original` (previews are stills); `QueueItem.isGif`. Key has asset.download. 194 tests. Reviewed in browser.
 10c. Share button in the Details row: `share.ts`, `originalFile` in `api.ts`. Shares via navigator.share, else downloads. 197 tests. Desktop and HTTPS phone reviewed.
 11. Add to album: `albums.ts`, `/api/albums`, `albumId` on `/api/decide` (a keep), `AlbumSheet`, `albumKeys.ts`, digit hotkeys in settings. 225 tests. Reviewed in browser.
+12. Modes: `modes.ts` (parse, on-this-day ranges), `queueModes.ts` (shuffle, on this day, album), `?mode=` and `&album=` on `/` and `/api/queue`. 256 tests. Reviewed in browser.
 
 ## Open decisions
 
-- Shuffle mode efficiency once most of the library is reviewed.
+- Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Photoshoot detection: time gap, location, or Immich data.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 
@@ -55,6 +54,6 @@
 - Task 16: needs prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/
   `XFF_DEPTH`, and a check for HSTS and no `Vary: Origin` on media.
 - Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
-- Queue is date ordered until task 12. A first page after a long reviewed run costs
-  one Immich search per 200 reviewed assets. Cursor allows 500 assets per timestamp.
-
+- On this day: UTC day bounds (a photo near midnight may land on the neighbouring day), years from 1990 only, one Immich search per empty year. No mode picker until task 13.
+- Not tested against real Immich: `albumIds.any` filter, `searchRandom` filter, takenAt range semantics.
+- Cursor allows 500 assets per timestamp.

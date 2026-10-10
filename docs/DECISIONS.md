@@ -65,3 +65,6 @@ Append only. One line per decision, with the reason.
 - 2026-10-10: Add to album is a keep with `albumId` on `/api/decide`, so the album add and the decision succeed or fail together. Immich's per-id "duplicate" result counts as success.
 - 2026-10-10: Undo does not remove an asset from an album: the key has no albumAsset.delete, and an album add is not tracked per decision.
 - 2026-10-10: Album hotkeys live in `settings` as JSON (digit to album id). Albums deleted in Immich are filtered out on read; the picker sets keys with a select per album.
+- 2026-10-10: Shuffle uses `searchRandom` and a constant cursor, since Immich random search has no seed or paging. The Deck drops repeats, and the server ends the queue after 3 random batches that are all reviewed.
+- 2026-10-10: On this day sends the client's local date as `day`, like `/api/decide`, so the server needs no timezone setting. Past years are scanned newest first, oldest first within a year, and the cursor is `year.keysetCursor`.
+- 2026-10-10: `/api/queue` takes `mode` and `album`, defaulting to shuffle. The `order` param is gone: album and on this day are always oldest first.
