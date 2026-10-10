@@ -1,15 +1,10 @@
 # State
 
 ## Current task
-10c. Share button.
+11. Add to album.
 
 ## Tasks (one per session, in order)
 
-10c. Share button: prepare the original photo or video. Desktop downloads it,
-    mobile opens the share sheet (navigator.share with files, needs HTTPS).
-    The `original` media kind exists (10b) and the key has asset.download.
-    Check large videos stream through it with Range, and that the share sheet
-    works over HTTPS.
 11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
 12. Modes: shuffle all (the default), on this day (date range per past
     year), single album.
@@ -35,6 +30,7 @@
 9. Swipe logic and screen (Card, Timeline, Controls, AssetInfo, keys), login restyle.
 10. Video in card, double-tap and F favorite.
 10b. GIFs play from `original` (previews are stills); `QueueItem.isGif`. Key has asset.download. 194 tests. Reviewed in browser.
+10c. Share button in the Details row: `share.ts`, `originalFile` in `api.ts`. Shares via navigator.share, else downloads. 197 tests. Desktop and HTTPS phone reviewed.
 
 ## Open decisions
 
@@ -51,6 +47,8 @@
   (cookie name, path, domain are constants). Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
 - Favorite on a keep costs one extra `getAsset`, so undo never unfavorites an existing favorite.
+- Share holds the whole original in memory, and a long video download may expire the share
+  gesture on iOS. Range streaming is untested on `original`.
 - Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
 - Task 16: needs prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/
   `XFF_DEPTH`, and a check for HSTS and no `Vary: Origin` on media.

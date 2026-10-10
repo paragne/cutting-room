@@ -61,3 +61,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-10: Videos autoplay muted and loop; sound is opt in through a button, because browsers block unmuted autoplay. The choice lasts for the session.
 - 2026-10-10: Share is split out as task 10c, and GIF autoplay as 10b. Share needs an original-file proxy kind and the API key's download permission, which is more than one change.
 - 2026-10-10: The API key now has asset.download, and the proxy serves an `original` kind (direct path, never `fullsize`). GIFs play from it because Immich previews are stills; share (10c) reuses it.
+- 2026-10-10: Share sits in the Details summary row and fetches `original` as a Blob, then uses navigator.share with files or an anchor download. Sharing needs the whole file in hand, so streaming does not apply.
