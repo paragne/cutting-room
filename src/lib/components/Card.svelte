@@ -1,20 +1,24 @@
 <script lang="ts">
 	import type { Action } from '$lib/server/db';
 	import type { QueueItem } from '$lib/server/queue';
+	import CardVideo from './CardVideo.svelte';
 	import DragOverlay from './DragOverlay.svelte';
 	import { release, velocity, type Sample } from '$lib/swipe';
+	import { isDoubleTap, isTap, type Point } from '$lib/tap';
 
 	let {
 		item,
 		from = null,
 		disabled = false,
-		onrelease
+		onrelease,
+		onfavorite
 	}: {
 		item: QueueItem;
 		/** The decision this card is returning from, so undo plays it backwards. */
 		from?: Action | null;
 		disabled?: boolean;
 		onrelease: (action: Action) => void;
+		onfavorite: () => void;
 	} = $props();
 
 	// Keep in step with the transition durations in the style block.
@@ -28,6 +32,8 @@
 	let leaving = $state<Action | null>(null);
 	let origin = { x: 0, y: 0 };
 	let samples: Sample[] = [];
+	let pressed: Point = { x: 0, y: 0, t: 0 };
+	let lastTap: Point | null = null;
 
 	const transform = $derived(
 		leaving === 'keep'
@@ -59,6 +65,7 @@
 		dragging = true;
 		width = el.clientWidth;
 		origin = { x: e.clientX, y: e.clientY };
+		pressed = { ...origin, t: e.timeStamp };
 		samples = [{ x: e.clientX, t: e.timeStamp }];
 	}
 
@@ -79,6 +86,12 @@
 		);
 		if (action) onrelease(action);
 		else dx = 0;
+		const tap = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+		if (!isTap(pressed, tap)) return;
+		if (lastTap && isDoubleTap(lastTap, tap)) {
+			lastTap = null;
+			onfavorite();
+		} else lastTap = tap;
 	}
 
 	function cancel() {
@@ -101,9 +114,10 @@
 	onpointercancel={cancel}
 	role="presentation"
 >
-	<img src="/media/{item.id}/preview" alt="Photo taken {item.localDateTime.slice(0, 10)}" draggable="false" />
 	{#if item.type === 'VIDEO'}
-		<span class="kind">Video</span>
+		<CardVideo id={item.id} />
+	{:else}
+		<img src="/media/{item.id}/preview" alt="Photo taken {item.localDateTime.slice(0, 10)}" draggable="false" />
 	{/if}
 	{#if dragging}
 		<DragOverlay {hint} {strength} />
@@ -149,19 +163,6 @@
 		height: 100%;
 		object-fit: contain;
 		pointer-events: none;
-	}
-	.kind {
-		position: absolute;
-		left: 12px;
-		bottom: 12px;
-		padding: 4px 8px;
-		background: var(--panel);
-		border-radius: 2px;
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--text-dim);
 	}
 	.razor {
 		position: absolute;

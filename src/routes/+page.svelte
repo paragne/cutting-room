@@ -27,11 +27,12 @@
 		if (deck.expired) void goto(resolve('/login'));
 	});
 
-	async function decide(action: Action) {
+	async function decide(action: Action, favorite = false) {
 		const shown = deck.current;
 		if (!shown || deck.busy || !card) return;
 		from = null;
-		await Promise.all([deck.decide(action), card.exit(action)]);
+		const sent = favorite ? deck.favorite() : deck.decide(action);
+		await Promise.all([sent, card.exit(action)]);
 		if (deck.current === shown) card?.rest();
 	}
 
@@ -48,6 +49,7 @@
 		e.preventDefault();
 		if (e.repeat) return;
 		if (cmd === 'undo') void undo();
+		else if (cmd === 'favorite') void decide('keep', true);
 		else void decide(cmd);
 	}
 </script>
@@ -76,6 +78,7 @@
 					{from}
 					disabled={deck.busy}
 					onrelease={decide}
+					onfavorite={() => decide('keep', true)}
 				/>
 			{/key}
 		{:else if deck.done}

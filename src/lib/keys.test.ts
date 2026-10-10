@@ -12,6 +12,13 @@ describe('command', () => {
 		expect(press('ArrowLeft')).toBe('trash');
 	});
 
+	it('favorites on F in either case, but not with a modifier', () => {
+		expect(press('f')).toBe('favorite');
+		expect(press('F')).toBe('favorite');
+		expect(press('f', { ctrlKey: true })).toBeNull();
+		expect(press('f', { altKey: true })).toBeNull();
+	});
+
 	it('undoes on Ctrl+Z or Cmd+Z in either case', () => {
 		expect(press('z', { ctrlKey: true })).toBe('undo');
 		expect(press('Z', { metaKey: true })).toBe('undo');

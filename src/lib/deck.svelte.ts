@@ -10,6 +10,7 @@ export interface Page {
 export interface DeckApi {
 	page(cursor: string | null): Promise<Page>;
 	decide(id: string, action: Action): Promise<void>;
+	favorite(id: string): Promise<void>;
 	undo(id: string): Promise<void>;
 }
 
@@ -69,11 +70,20 @@ export class Deck {
 		return this.#fetching;
 	}
 
-	async decide(action: Action): Promise<void> {
+	decide(action: Action): Promise<void> {
+		return this.#commit(action, (id) => this.#api.decide(id, action));
+	}
+
+	/** Keeps the current card and favorites it in Immich. */
+	favorite(): Promise<void> {
+		return this.#commit('keep', (id) => this.#api.favorite(id));
+	}
+
+	async #commit(action: Action, send: (id: string) => Promise<void>): Promise<void> {
 		const item = this.current;
 		if (!item || this.busy) return;
 		await this.#step(async () => {
-			await this.#api.decide(item.id, action);
+			await send(item.id);
 			this.#cards.shift();
 			this.history.push({ item, action });
 		});

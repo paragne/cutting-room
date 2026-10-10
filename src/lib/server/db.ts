@@ -32,6 +32,8 @@ export interface Decision {
 	decidedAt: number;
 	/** Local calendar date, YYYY-MM-DD, that the decision counts toward. */
 	day: string;
+	/** This decision set the Immich favorite flag, so undo clears it. */
+	favorite: boolean;
 }
 
 export function openDb(path: string) {
@@ -40,14 +42,20 @@ export function openDb(path: string) {
 	db.pragma('foreign_keys = ON');
 	migrate(db);
 
-	const findDecision = db.prepare<[string], Decision>(
-		'SELECT asset_id AS assetId, action, bytes, decided_at AS decidedAt, day FROM decisions WHERE asset_id = ?'
+	const selectDecision = db.prepare<[string], Omit<Decision, 'favorite'> & { favorite: number }>(
+		'SELECT asset_id AS assetId, action, bytes, decided_at AS decidedAt, day, favorite FROM decisions WHERE asset_id = ?'
 	);
-	const upsertDecision = db.prepare<[string, Action, number | null, number, string]>(
-		`INSERT INTO decisions (asset_id, action, bytes, decided_at, day) VALUES (?, ?, ?, ?, ?)
+	const findDecision = {
+		get(assetId: string): Decision | undefined {
+			const row = selectDecision.get(assetId);
+			return row && { ...row, favorite: row.favorite === 1 };
+		}
+	};
+	const upsertDecision = db.prepare<[string, Action, number | null, number, string, number]>(
+		`INSERT INTO decisions (asset_id, action, bytes, decided_at, day, favorite) VALUES (?, ?, ?, ?, ?, ?)
 		ON CONFLICT (asset_id) DO UPDATE SET
 			action = excluded.action, bytes = excluded.bytes,
-			decided_at = excluded.decided_at, day = excluded.day`
+			decided_at = excluded.decided_at, day = excluded.day, favorite = excluded.favorite`
 	);
 	const deleteDecision = db.prepare<[string]>('DELETE FROM decisions WHERE asset_id = ?');
 	// sign is 1 to count a decision and -1 to take it back.
@@ -69,7 +77,7 @@ export function openDb(path: string) {
 		recordDecision: db.transaction((d: Decision) => {
 			const previous = findDecision.get(d.assetId);
 			if (previous) countDay(previous, -1);
-			upsertDecision.run(d.assetId, d.action, d.bytes, d.decidedAt, d.day);
+			upsertDecision.run(d.assetId, d.action, d.bytes, d.decidedAt, d.day, d.favorite ? 1 : 0);
 			countDay(d, 1);
 		}),
 		// Returns the removed decision so the caller knows whether to restore from trash.

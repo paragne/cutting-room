@@ -2,12 +2,13 @@ import type { AssetResponseDto } from '@immich/sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { openDb, type Db } from './db';
 import { decide, isValidDay, parseDecide, parseUndo, undo } from './decide';
-import { getAsset, restoreAssets, trashAssets } from './immich';
+import { getAsset, restoreAssets, setFavorite, trashAssets } from './immich';
 
 vi.mock('./immich', () => ({
 	getAsset: vi.fn(),
 	trashAssets: vi.fn(),
-	restoreAssets: vi.fn()
+	restoreAssets: vi.fn(),
+	setFavorite: vi.fn()
 }));
 
 const id = '0b6f2c1e-8a4d-4f7e-9c3b-2d5a6e7f8091';
@@ -31,6 +32,7 @@ beforeEach(() => {
 	vi.mocked(getAsset).mockResolvedValue(asset());
 	vi.mocked(trashAssets).mockResolvedValue();
 	vi.mocked(restoreAssets).mockResolvedValue(1);
+	vi.mocked(setFavorite).mockResolvedValue();
 });
 
 describe('isValidDay', () => {
@@ -172,5 +174,64 @@ describe('undo', () => {
 		vi.mocked(restoreAssets).mockRejectedValue(new Error('down'));
 		await expect(undo(db, id)).rejects.toThrow('down');
 		expect(db.findDecision.get(id)).toMatchObject({ action: 'trash' });
+	});
+});
+
+describe('favorite', () => {
+	it('parses favorite only with keep', () => {
+		expect(parseDecide({ id, action: 'keep', day, favorite: true }, now)).toEqual({
+			id,
+			action: 'keep',
+			day,
+			favorite: true
+		});
+		expect(typeof parseDecide({ id, action: 'trash', day, favorite: true }, now)).toBe('string');
+		expect(typeof parseDecide({ id, action: 'keep', day, favorite: 'yes' }, now)).toBe('string');
+	});
+
+	it('favorites in Immich and records the keep', async () => {
+		vi.mocked(getAsset).mockResolvedValue(asset({ isFavorite: false }));
+		expect(await decide(db, { id, action: 'keep', day, favorite: true }, now)).toEqual({ status: 200 });
+		expect(setFavorite).toHaveBeenCalledWith(id, true);
+		expect(db.findDecision.get(id)).toMatchObject({ action: 'keep', favorite: true });
+	});
+
+	it('records nothing when Immich fails', async () => {
+		vi.mocked(getAsset).mockResolvedValue(asset({ isFavorite: false }));
+		vi.mocked(setFavorite).mockRejectedValue(new Error('down'));
+		await expect(decide(db, { id, action: 'keep', day, favorite: true }, now)).rejects.toThrow('down');
+		expect(db.findDecision.get(id)).toBeUndefined();
+	});
+
+	it('returns 404 for an unknown asset', async () => {
+		vi.mocked(getAsset).mockResolvedValue(null);
+		expect(await decide(db, { id, action: 'keep', day, favorite: true }, now)).toMatchObject({
+			status: 404
+		});
+		expect(setFavorite).not.toHaveBeenCalled();
+	});
+
+	it('clears the flag on undo', async () => {
+		vi.mocked(getAsset).mockResolvedValue(asset({ isFavorite: false }));
+		await decide(db, { id, action: 'keep', day, favorite: true }, now);
+		expect(await undo(db, id)).toEqual({ status: 200 });
+		expect(setFavorite).toHaveBeenLastCalledWith(id, false);
+		expect(db.findDecision.get(id)).toBeUndefined();
+	});
+
+	it('leaves a flag that was already set alone on undo', async () => {
+		vi.mocked(getAsset).mockResolvedValue(asset({ isFavorite: true }));
+		await decide(db, { id, action: 'keep', day, favorite: true }, now);
+		expect(setFavorite).not.toHaveBeenCalled();
+		await undo(db, id);
+		expect(setFavorite).not.toHaveBeenCalled();
+	});
+
+	it('keeps the decision when clearing the flag fails', async () => {
+		vi.mocked(getAsset).mockResolvedValue(asset({ isFavorite: false }));
+		await decide(db, { id, action: 'keep', day, favorite: true }, now);
+		vi.mocked(setFavorite).mockRejectedValue(new Error('down'));
+		await expect(undo(db, id)).rejects.toThrow('down');
+		expect(db.findDecision.get(id)).toMatchObject({ favorite: true });
 	});
 });

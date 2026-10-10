@@ -39,6 +39,11 @@ export async function decide(id: string, action: Action): Promise<void> {
 	await post('/api/decide', { id, action, day: localDay(new Date()) });
 }
 
+/** Keeps the asset and sets its Immich favorite flag. */
+export async function favorite(id: string): Promise<void> {
+	await post('/api/decide', { id, action: 'keep', favorite: true, day: localDay(new Date()) });
+}
+
 export async function undo(id: string): Promise<void> {
 	await post('/api/undo', { id });
 }

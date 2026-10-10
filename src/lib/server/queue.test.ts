@@ -63,7 +63,8 @@ function keep(db: Db, ids: string[]): void {
 			action: 'keep',
 			bytes: null,
 			decidedAt: 1,
-			day: '2026-10-08'
+			day: '2026-10-08',
+			favorite: false
 		});
 	}
 }

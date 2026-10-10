@@ -22,7 +22,7 @@ describe('openDb', () => {
 		db.exec('DROP TABLE decisions; DROP TABLE daily_stats; DROP TABLE settings');
 		db.pragma('user_version = 1');
 		migrate(db);
-		expect(db.pragma('user_version', { simple: true })).toBe(2);
+		expect(db.pragma('user_version', { simple: true })).toBe(3);
 		expect(db.prepare("SELECT count(*) AS n FROM sqlite_master WHERE type = 'table'").get()).toEqual({
 			n: 4
 		});
@@ -37,14 +37,16 @@ const keep = (assetId: string, day = '2026-10-08'): Decision => ({
 	action: 'keep',
 	bytes: null,
 	decidedAt: 1,
-	day
+	day,
+	favorite: false
 });
 const trash = (assetId: string, bytes: number | null, day = '2026-10-08'): Decision => ({
 	assetId,
 	action: 'trash',
 	bytes,
 	decidedAt: 2,
-	day
+	day,
+	favorite: false
 });
 
 describe('decisions', () => {

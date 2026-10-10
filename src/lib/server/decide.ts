@@ -1,6 +1,6 @@
 import { AssetVisibility } from '@immich/sdk';
 import type { Action, Db } from './db';
-import { getAsset, restoreAssets, trashAssets } from './immich';
+import { getAsset, restoreAssets, setFavorite, trashAssets } from './immich';
 import { isUuid } from './media';
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -24,16 +24,20 @@ export interface DecideRequest {
 	id: string;
 	action: Action;
 	day: string;
+	/** Also set the Immich favorite flag. Only valid with keep. */
+	favorite?: true;
 }
 
 /** Validates an untrusted JSON body. Returns the request or a 400 message. */
 export function parseDecide(body: unknown, now: number): DecideRequest | string {
 	if (typeof body !== 'object' || body === null) return 'body must be an object';
-	const { id, action, day } = body as Record<string, unknown>;
+	const { id, action, day, favorite } = body as Record<string, unknown>;
 	if (typeof id !== 'string' || !isUuid(id)) return 'id must be a UUID';
 	if (action !== 'keep' && action !== 'trash') return 'action must be keep or trash';
 	if (typeof day !== 'string' || !isValidDay(day, now)) return 'day must be today, YYYY-MM-DD';
-	return { id, action, day };
+	if (favorite === undefined || favorite === false) return { id, action, day };
+	if (favorite !== true || action !== 'keep') return 'favorite must be true and only with keep';
+	return { id, action, day, favorite };
 }
 
 /** Validates an untrusted JSON body for undo. Returns the asset id or a 400 message. */
@@ -49,7 +53,15 @@ export function parseUndo(body: unknown): { id: string } | string {
 export async function decide(db: Db, req: DecideRequest, now: number): Promise<Outcome> {
 	if (db.findDecision.get(req.id)) return { status: 409, message: 'already decided' };
 	let bytes: number | null = null;
-	if (req.action === 'trash') {
+	let favorited = false;
+	if (req.favorite) {
+		const asset = await getAsset(req.id);
+		if (!asset) return { status: 404, message: 'asset not found' };
+		if (!asset.isFavorite) {
+			await setFavorite(req.id, true);
+			favorited = true;
+		}
+	} else if (req.action === 'trash') {
 		const asset = await getAsset(req.id);
 		if (!asset) return { status: 404, message: 'asset not found' };
 		if (asset.isTrashed || asset.visibility !== AssetVisibility.Timeline) {
@@ -63,7 +75,8 @@ export async function decide(db: Db, req: DecideRequest, now: number): Promise<O
 		action: req.action,
 		bytes,
 		decidedAt: now,
-		day: req.day
+		day: req.day,
+		favorite: favorited
 	});
 	return { status: 200 };
 }
@@ -75,6 +88,7 @@ export async function undo(db: Db, id: string): Promise<Outcome> {
 	if (decision.action === 'trash' && (await restoreAssets([id])) === 0) {
 		return { status: 409, message: 'asset is no longer in Immich trash' };
 	}
+	if (decision.favorite) await setFavorite(id, false);
 	db.removeDecision(id);
 	return { status: 200 };
 }
