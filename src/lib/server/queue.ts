@@ -23,6 +23,8 @@ export interface QueueItem {
 	isFavorite: boolean;
 	/** Milliseconds, null for images. */
 	duration: number | null;
+	/** GIFs play from the original file, since previews are stills. */
+	isGif: boolean;
 }
 
 export const PAGE_SIZE = 20;
@@ -72,7 +74,8 @@ function toItem(a: AssetResponseDto): QueueItem {
 		type: a.type,
 		localDateTime: a.localDateTime,
 		isFavorite: a.isFavorite,
-		duration: a.duration
+		duration: a.duration,
+		isGif: a.originalMimeType === 'image/gif'
 	};
 }
 

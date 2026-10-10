@@ -44,9 +44,10 @@ Restore needs `asset.delete`, not `asset.update`.
 ## API key permissions for the app
 
 `asset.read`, `asset.update`, `asset.delete`, `asset.view`, `asset.statistics`,
-`album.read`, `albumAsset.create`, `duplicate.read`. Nothing else.
+`album.read`, `albumAsset.create`, `duplicate.read`, `asset.download`. Nothing else.
 
-Do not grant `asset.download`. Do not grant `library.*` or `duplicate.delete`.
+`asset.download` is for the `original` media kind: GIF playback (previews are
+stills) and the share button. Do not grant `library.*` or `duplicate.delete`.
 
 ## Search (v3.2 structured shape)
 
@@ -84,7 +85,7 @@ Live request that returned the 3 oldest timeline assets:
 
 - `size=thumbnail` returned `image/webp`. `size=preview` returned `image/jpeg`.
 - `size=fullsize` returned `302` to `original`, which needs `asset.download`.
-  Use only `thumbnail` and `preview`. The proxy must not follow redirects.
+  Use `thumbnail` and `preview`, and `original` directly (never `fullsize`). The proxy must not follow redirects.
 - Video playback with `Range: bytes=0-1023` returned `206` with
   `Content-Range`, `Accept-Ranges: bytes`, `Content-Type: video/mp4`.
 - Immich also sends `Cache-Control: private, max-age=86400, ...`. Our header

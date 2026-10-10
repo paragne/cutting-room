@@ -119,7 +119,8 @@ describe('fetchMedia', () => {
 	it.each([
 		['thumbnail', `/api/assets/${id}/thumbnail?size=thumbnail`],
 		['preview', `/api/assets/${id}/thumbnail?size=preview`],
-		['video', `/api/assets/${id}/video/playback`]
+		['video', `/api/assets/${id}/video/playback`],
+		['original', `/api/assets/${id}/original`]
 	] as const)('requests %s from its own path', async (kind, path) => {
 		await fetchMedia(id, kind, null, signal);
 		expect(call().url).toBe(`http://immich.test${path}`);

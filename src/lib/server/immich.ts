@@ -130,14 +130,15 @@ export async function getDuplicates(): Promise<DuplicateResponseDto[]> {
 	return sdk.getAssetDuplicates();
 }
 
-export type MediaKind = 'thumbnail' | 'preview' | 'video';
+export type MediaKind = 'thumbnail' | 'preview' | 'video' | 'original';
 
-// Never `fullsize`: Immich answers it with a redirect to the original, which needs
-// asset.download. The SDK's Blob calls buffer whole files, so this uses fetch.
+// Never `fullsize`: Immich answers it with a redirect. `original` is the direct
+// path and needs asset.download. The SDK's Blob calls buffer whole files, so this uses fetch.
 const MEDIA_PATH: Record<MediaKind, string> = {
 	thumbnail: 'thumbnail?size=thumbnail',
 	preview: 'thumbnail?size=preview',
-	video: 'video/playback'
+	video: 'video/playback',
+	original: 'original'
 };
 
 export async function fetchMedia(

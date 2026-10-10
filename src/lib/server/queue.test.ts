@@ -39,7 +39,8 @@ function makeLibrary(count: number, tie = 1): AssetResponseDto[] {
 		fileCreatedAt: new Date(Date.UTC(2020, 0, 1) + Math.floor(i / tie) * 1000).toISOString(),
 		localDateTime: '2020-01-01T00:00:00.000Z',
 		isFavorite: false,
-		duration: null
+		duration: null,
+		originalMimeType: 'image/jpeg'
 	})) as unknown as AssetResponseDto[];
 }
 
@@ -133,6 +134,7 @@ describe('nextPage', () => {
 			'duration',
 			'id',
 			'isFavorite',
+			'isGif',
 			'localDateTime',
 			'type'
 		]);
@@ -162,5 +164,16 @@ describe('cursor', () => {
 		]
 	])('rejects %s', (_, raw) => {
 		expect(decodeCursor(raw)).toBeNull();
+	});
+});
+
+describe('GIF flag', () => {
+	it.each([
+		['image/gif', true],
+		['image/jpeg', false]
+	])('marks %s as isGif=%s', async (originalMimeType, isGif) => {
+		library = makeLibrary(1).map((a) => ({ ...a, originalMimeType })) as AssetResponseDto[];
+		const [item] = (await nextPage(db, 'oldest', null)).items;
+		expect(item!.isGif).toBe(isGif);
 	});
 });

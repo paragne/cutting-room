@@ -4,7 +4,7 @@ import { log } from './log';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // One range only. Anything else is dropped and the full body is served.
 const SINGLE_RANGE = /^bytes=(\d+-\d*|-\d+)$/;
-const KINDS: readonly string[] = ['thumbnail', 'preview', 'video'] satisfies MediaKind[];
+const KINDS: readonly string[] = ['thumbnail', 'preview', 'video', 'original'] satisfies MediaKind[];
 const PASSED_HEADERS = ['content-type', 'content-length', 'content-range', 'accept-ranges'];
 const PASSED_STATUS = [200, 206, 416];
 

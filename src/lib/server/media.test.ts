@@ -28,7 +28,7 @@ describe('proxyMedia', () => {
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
-	it.each(['fullsize', 'original', 'download', ''])('has no %j kind', async (kind) => {
+	it.each(['fullsize', 'download', ''])('has no %j kind', async (kind) => {
 		const res = await proxyMedia(id, kind, request());
 		expect(res.status).toBe(404);
 		expect(fetchMock).not.toHaveBeenCalled();
@@ -77,6 +77,18 @@ describe('proxyMedia', () => {
 		const res = await proxyMedia(id, 'video', request({ range: 'bytes=9000-' }));
 		expect(res.status).toBe(416);
 		expect(res.headers.get('content-range')).toBe('bytes */5000');
+	});
+
+	it('proxies the original with the same header allowlist as video', async () => {
+		fetchMock.mockResolvedValue(
+			upstream(200, { 'content-type': 'image/gif', 'set-cookie': 'a=b', 'x-immich': '1' }, 'GIF89a')
+		);
+		const res = await proxyMedia(id, 'original', request({ range: 'bytes=0-9' }));
+		expect(fetchMock).toHaveBeenCalledWith(id, 'original', 'bytes=0-9', expect.any(AbortSignal));
+		expect(res.status).toBe(200);
+		expect(res.headers.get('content-type')).toBe('image/gif');
+		expect(res.headers.has('set-cookie')).toBe(false);
+		expect(res.headers.has('x-immich')).toBe(false);
 	});
 
 	it('maps a missing asset to 404', async () => {

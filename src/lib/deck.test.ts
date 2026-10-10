@@ -10,7 +10,8 @@ function item(n: number): QueueItem {
 		type: AssetTypeEnum.Image,
 		localDateTime: '2020-01-01T00:00:00.000Z',
 		isFavorite: false,
-		duration: null
+		duration: null,
+		isGif: false
 	};
 }
 

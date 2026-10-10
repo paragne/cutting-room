@@ -117,7 +117,7 @@
 	{#if item.type === 'VIDEO'}
 		<CardVideo id={item.id} />
 	{:else}
-		<img src="/media/{item.id}/preview" alt="Photo taken {item.localDateTime.slice(0, 10)}" draggable="false" />
+		<img src="/media/{item.id}/{item.isGif ? 'original' : 'preview'}" alt="Photo taken {item.localDateTime.slice(0, 10)}" draggable="false" />
 	{/if}
 	{#if dragging}
 		<DragOverlay {hint} {strength} />
