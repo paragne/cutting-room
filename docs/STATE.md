@@ -1,11 +1,10 @@
 # State
 
 ## Current task
-11. Add to album.
+12. Modes: shuffle all (the default), on this day, single album.
 
 ## Tasks (one per session, in order)
 
-11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
 12. Modes: shuffle all (the default), on this day (date range per past
     year), single album.
 12b. Photoshoot shuffle: random burst, pick the best, trash the rest.
@@ -31,6 +30,7 @@
 10. Video in card, double-tap and F favorite.
 10b. GIFs play from `original` (previews are stills); `QueueItem.isGif`. Key has asset.download. 194 tests. Reviewed in browser.
 10c. Share button in the Details row: `share.ts`, `originalFile` in `api.ts`. Shares via navigator.share, else downloads. 197 tests. Desktop and HTTPS phone reviewed.
+11. Add to album: `albums.ts`, `/api/albums`, `albumId` on `/api/decide` (a keep), `AlbumSheet`, `albumKeys.ts`, digit hotkeys in settings. 225 tests. Reviewed in browser.
 
 ## Open decisions
 
@@ -49,7 +49,9 @@
 - Favorite on a keep costs one extra `getAsset`, so undo never unfavorites an existing favorite.
 - Share holds the whole original in memory, and a long video download may expire the share
   gesture on iOS. Range streaming is untested on `original`.
-- Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
+- Not tested live: startup with server trash disabled. Album add confirmed only by browser review.
+- Undo does not remove an asset from an album (key lacks albumAsset.delete).
+- `src/routes/+page.svelte` is 248 lines, over the 200 line rule. Split it (album and hotkey state is a candidate).
 - Task 16: needs prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/
   `XFF_DEPTH`, and a check for HSTS and no `Vary: Origin` on media.
 - Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
