@@ -1,4 +1,6 @@
+import type { Hotkeys } from './albumKeys';
 import type { Page } from './deck.svelte';
+import type { AlbumList } from './server/albums';
 import type { AssetInfo } from './server/assetInfo';
 import type { Action } from './server/db';
 
@@ -42,6 +44,23 @@ export async function decide(id: string, action: Action): Promise<void> {
 /** Keeps the asset and sets its Immich favorite flag. */
 export async function favorite(id: string): Promise<void> {
 	await post('/api/decide', { id, action: 'keep', favorite: true, day: localDay(new Date()) });
+}
+
+/** Keeps the asset and adds it to an Immich album. */
+export async function addToAlbum(id: string, albumId: string): Promise<void> {
+	await post('/api/decide', { id, action: 'keep', albumId, day: localDay(new Date()) });
+}
+
+export async function albums(): Promise<AlbumList> {
+	return (await send('/api/albums')).json() as Promise<AlbumList>;
+}
+
+export async function saveHotkeys(hotkeys: Hotkeys): Promise<void> {
+	await send('/api/albums', {
+		method: 'PUT',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({ hotkeys })
+	});
 }
 
 export async function undo(id: string): Promise<void> {

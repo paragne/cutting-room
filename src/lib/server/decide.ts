@@ -1,6 +1,6 @@
 import { AssetVisibility } from '@immich/sdk';
 import type { Action, Db } from './db';
-import { getAsset, restoreAssets, setFavorite, trashAssets } from './immich';
+import { addToAlbum, getAsset, restoreAssets, setFavorite, trashAssets } from './immich';
 import { isUuid } from './media';
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -26,18 +26,29 @@ export interface DecideRequest {
 	day: string;
 	/** Also set the Immich favorite flag. Only valid with keep. */
 	favorite?: true;
+	/** Also add to this album. Only valid with keep. */
+	albumId?: string;
 }
 
 /** Validates an untrusted JSON body. Returns the request or a 400 message. */
 export function parseDecide(body: unknown, now: number): DecideRequest | string {
 	if (typeof body !== 'object' || body === null) return 'body must be an object';
-	const { id, action, day, favorite } = body as Record<string, unknown>;
+	const { id, action, day, favorite, albumId } = body as Record<string, unknown>;
 	if (typeof id !== 'string' || !isUuid(id)) return 'id must be a UUID';
 	if (action !== 'keep' && action !== 'trash') return 'action must be keep or trash';
 	if (typeof day !== 'string' || !isValidDay(day, now)) return 'day must be today, YYYY-MM-DD';
-	if (favorite === undefined || favorite === false) return { id, action, day };
-	if (favorite !== true || action !== 'keep') return 'favorite must be true and only with keep';
-	return { id, action, day, favorite };
+	const req: DecideRequest = { id, action, day };
+	if (favorite !== undefined && favorite !== false) {
+		if (favorite !== true || action !== 'keep') return 'favorite must be true and only with keep';
+		req.favorite = true;
+	}
+	if (albumId !== undefined) {
+		if (typeof albumId !== 'string' || !isUuid(albumId) || action !== 'keep') {
+			return 'albumId must be a UUID and only with keep';
+		}
+		req.albumId = albumId;
+	}
+	return req;
 }
 
 /** Validates an untrusted JSON body for undo. Returns the asset id or a 400 message. */
@@ -54,6 +65,13 @@ export async function decide(db: Db, req: DecideRequest, now: number): Promise<O
 	if (db.findDecision.get(req.id)) return { status: 409, message: 'already decided' };
 	let bytes: number | null = null;
 	let favorited = false;
+	if (req.albumId) {
+		// Immich reports a refused add per id, not as an HTTP error. Already in the album is fine.
+		const [added] = await addToAlbum(req.albumId, [req.id]);
+		if (!added?.success && added?.error !== 'duplicate') {
+			return { status: 409, message: `album refused the asset (${added?.error ?? 'no result'})` };
+		}
+	}
 	if (req.favorite) {
 		const asset = await getAsset(req.id);
 		if (!asset) return { status: 404, message: 'asset not found' };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { command } from './keys';
+import { command, digit } from './keys';
 
 const press = (
 	key: string,
@@ -29,5 +29,24 @@ describe('command', () => {
 		expect(press('a')).toBeNull();
 		expect(press('ArrowRight', { ctrlKey: true })).toBeNull();
 		expect(press('ArrowLeft', { altKey: true })).toBeNull();
+	});
+});
+
+describe('digit', () => {
+	const key = (k: string, mods: { ctrlKey?: boolean; metaKey?: boolean; altKey?: boolean } = {}) =>
+		digit({ key: k, ctrlKey: false, metaKey: false, altKey: false, ...mods });
+
+	it('returns bare digits', () => {
+		expect(key('0')).toBe('0');
+		expect(key('7')).toBe('7');
+	});
+
+	it('ignores letters, multi-character keys and modified digits', () => {
+		expect(key('a')).toBeNull();
+		expect(key('10')).toBeNull();
+		expect(key('ArrowRight')).toBeNull();
+		expect(key('1', { ctrlKey: true })).toBeNull();
+		expect(key('1', { metaKey: true })).toBeNull();
+		expect(key('1', { altKey: true })).toBeNull();
 	});
 });

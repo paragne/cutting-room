@@ -62,3 +62,6 @@ Append only. One line per decision, with the reason.
 - 2026-10-10: Share is split out as task 10c, and GIF autoplay as 10b. Share needs an original-file proxy kind and the API key's download permission, which is more than one change.
 - 2026-10-10: The API key now has asset.download, and the proxy serves an `original` kind (direct path, never `fullsize`). GIFs play from it because Immich previews are stills; share (10c) reuses it.
 - 2026-10-10: Share sits in the Details summary row and fetches `original` as a Blob, then uses navigator.share with files or an anchor download. Sharing needs the whole file in hand, so streaming does not apply.
+- 2026-10-10: Add to album is a keep with `albumId` on `/api/decide`, so the album add and the decision succeed or fail together. Immich's per-id "duplicate" result counts as success.
+- 2026-10-10: Undo does not remove an asset from an album: the key has no albumAsset.delete, and an album add is not tracked per decision.
+- 2026-10-10: Album hotkeys live in `settings` as JSON (digit to album id). Albums deleted in Immich are filtered out on read; the picker sets keys with a select per album.

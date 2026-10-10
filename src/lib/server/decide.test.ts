@@ -2,9 +2,10 @@ import type { AssetResponseDto } from '@immich/sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { openDb, type Db } from './db';
 import { decide, isValidDay, parseDecide, parseUndo, undo } from './decide';
-import { getAsset, restoreAssets, setFavorite, trashAssets } from './immich';
+import { addToAlbum, getAsset, restoreAssets, setFavorite, trashAssets } from './immich';
 
 vi.mock('./immich', () => ({
+	addToAlbum: vi.fn(),
 	getAsset: vi.fn(),
 	trashAssets: vi.fn(),
 	restoreAssets: vi.fn(),
@@ -33,6 +34,7 @@ beforeEach(() => {
 	vi.mocked(trashAssets).mockResolvedValue();
 	vi.mocked(restoreAssets).mockResolvedValue(1);
 	vi.mocked(setFavorite).mockResolvedValue();
+	vi.mocked(addToAlbum).mockResolvedValue([{ id, success: true }]);
 });
 
 describe('isValidDay', () => {
@@ -64,6 +66,27 @@ describe('parseDecide', () => {
 		{ id, action: 'delete', day },
 		{ id, action: 'keep', day: '2020-01-01' },
 		{ id, action: 'keep' }
+	])('rejects %j', (body) => {
+		expect(typeof parseDecide(body, now)).toBe('string');
+	});
+});
+
+describe('parseDecide albumId', () => {
+	const album = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
+
+	it('accepts an album with keep', () => {
+		expect(parseDecide({ id, action: 'keep', day, albumId: album }, now)).toEqual({
+			id,
+			action: 'keep',
+			day,
+			albumId: album
+		});
+	});
+
+	it.each([
+		{ id, action: 'trash', day, albumId: album },
+		{ id, action: 'keep', day, albumId: 'nope' },
+		{ id, action: 'keep', day, albumId: 5 }
 	])('rejects %j', (body) => {
 		expect(typeof parseDecide(body, now)).toBe('string');
 	});
@@ -233,5 +256,35 @@ describe('favorite', () => {
 		vi.mocked(setFavorite).mockRejectedValue(new Error('down'));
 		await expect(undo(db, id)).rejects.toThrow('down');
 		expect(db.findDecision.get(id)).toMatchObject({ favorite: true });
+	});
+});
+
+describe('decide with an album', () => {
+	const albumId = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
+
+	it('adds to the album and records a keep', async () => {
+		expect(await decide(db, { id, action: 'keep', day, albumId }, now)).toEqual({ status: 200 });
+		expect(addToAlbum).toHaveBeenCalledWith(albumId, [id]);
+		expect(db.findDecision.get(id)).toMatchObject({ action: 'keep' });
+	});
+
+	it('treats already in the album as success', async () => {
+		vi.mocked(addToAlbum).mockResolvedValue([{ id, success: false, error: 'duplicate' }] as never);
+		expect(await decide(db, { id, action: 'keep', day, albumId }, now)).toEqual({ status: 200 });
+		expect(db.findDecision.get(id)).toBeDefined();
+	});
+
+	it('records nothing when the album refuses the asset', async () => {
+		vi.mocked(addToAlbum).mockResolvedValue([{ id, success: false, error: 'not_found' }] as never);
+		expect(await decide(db, { id, action: 'keep', day, albumId }, now)).toMatchObject({
+			status: 409
+		});
+		expect(db.findDecision.get(id)).toBeUndefined();
+	});
+
+	it('records nothing when the Immich call fails', async () => {
+		vi.mocked(addToAlbum).mockRejectedValue(new Error('down'));
+		await expect(decide(db, { id, action: 'keep', day, albumId }, now)).rejects.toThrow('down');
+		expect(db.findDecision.get(id)).toBeUndefined();
 	});
 });

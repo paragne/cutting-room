@@ -4,12 +4,14 @@
 		canUndo,
 		ontrash,
 		onundo,
+		onalbum,
 		onkeep
 	}: {
 		busy: boolean;
 		canUndo: boolean;
 		ontrash: () => void;
 		onundo: () => void;
+		onalbum: () => void;
 		onkeep: () => void;
 	} = $props();
 </script>
@@ -21,6 +23,9 @@
 	<button class="undo" aria-disabled={busy || !canUndo} onclick={onundo}>
 		Undo <kbd>Ctrl Z</kbd>
 	</button>
+	<button class="album" aria-disabled={busy} onclick={onalbum}>
+		Album <kbd>0-9</kbd>
+	</button>
 	<button class="keep" aria-disabled={busy} onclick={onkeep}>
 		Keep <kbd>→</kbd>
 	</button>
@@ -29,7 +34,7 @@
 <style>
 	.controls {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: repeat(4, 1fr);
 		gap: 8px;
 		padding: 12px;
 		background: var(--panel);

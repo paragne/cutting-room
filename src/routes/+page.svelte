@@ -4,12 +4,15 @@
 	import { onMount } from 'svelte';
 	import '$lib/theme.css';
 	import * as api from '$lib/api';
+	import AlbumSheet from '$lib/components/AlbumSheet.svelte';
 	import AssetInfo from '$lib/components/AssetInfo.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Controls from '$lib/components/Controls.svelte';
 	import Timeline from '$lib/components/Timeline.svelte';
 	import { Deck } from '$lib/deck.svelte';
-	import { command } from '$lib/keys';
+	import type { Hotkeys } from '$lib/albumKeys';
+	import { command, digit } from '$lib/keys';
+	import type { AlbumList } from '$lib/server/albums';
 	import type { Action } from '$lib/server/db';
 
 	const deck = new Deck(api);
@@ -17,11 +20,39 @@
 	let from = $state<Action | null>(null);
 	let loaded = $state(false);
 	let detailsOpen = $state(false);
+	let albumList = $state<AlbumList>({ albums: [], hotkeys: {} });
+	let sheetOpen = $state(false);
 
 	onMount(async () => {
-		await deck.refill();
+		await Promise.all([deck.refill(), loadAlbums()]);
 		loaded = true;
 	});
+
+	async function loadAlbums() {
+		try {
+			albumList = await api.albums();
+		} catch (e) {
+			deck.error = e instanceof Error ? e.message : String(e);
+		}
+	}
+
+	async function saveHotkeys(hotkeys: Hotkeys) {
+		try {
+			await api.saveHotkeys(hotkeys);
+			albumList = { ...albumList, hotkeys };
+		} catch (e) {
+			deck.error = e instanceof Error ? e.message : String(e);
+		}
+	}
+
+	async function addToAlbum(albumId: string) {
+		sheetOpen = false;
+		const shown = deck.current;
+		if (!shown || deck.busy || !card) return;
+		from = null;
+		await Promise.all([deck.addToAlbum(albumId), card.exit('keep')]);
+		if (deck.current === shown) card?.rest();
+	}
 
 	$effect(() => {
 		if (deck.expired) void goto(resolve('/login'));
@@ -44,6 +75,13 @@
 	}
 
 	function onkeydown(e: KeyboardEvent) {
+		if (sheetOpen) return;
+		const album = digit(e);
+		if (album !== null) {
+			const albumId = albumList.hotkeys[album];
+			if (albumId && !e.repeat) void addToAlbum(albumId);
+			return;
+		}
 		const cmd = command(e);
 		if (!cmd) return;
 		e.preventDefault();
@@ -108,9 +146,18 @@
 		canUndo={deck.history.length > 0}
 		ontrash={() => decide('trash')}
 		onundo={undo}
+		onalbum={() => (sheetOpen = true)}
 		onkeep={() => decide('keep')}
 	/>
 </div>
+
+<AlbumSheet
+	bind:open={sheetOpen}
+	albums={albumList.albums}
+	hotkeys={albumList.hotkeys}
+	onpick={addToAlbum}
+	onhotkeys={saveHotkeys}
+/>
 
 <style>
 	.suite {

@@ -9,6 +9,12 @@ interface KeyLike {
 	altKey: boolean;
 }
 
+/** A bare digit key, for album hotkeys. */
+export function digit(e: KeyLike): string | null {
+	if (e.altKey || e.ctrlKey || e.metaKey) return null;
+	return /^[0-9]$/.test(e.key) ? e.key : null;
+}
+
 export function command(e: KeyLike): Command | null {
 	if (e.altKey) return null;
 	const mod = e.ctrlKey || e.metaKey;
