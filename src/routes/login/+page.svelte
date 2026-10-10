@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import '$lib/theme.css';
 
 	let { form }: PageProps = $props();
 </script>
@@ -24,21 +25,53 @@
 	main {
 		display: grid;
 		min-height: 100dvh;
-		padding: 1rem;
+		padding: 12px;
 		align-items: end;
 	}
 
 	form {
 		display: grid;
-		gap: 0.5rem;
+		gap: 8px;
 		width: 100%;
 		max-width: 24rem;
 		margin: 0 auto 25dvh;
+		padding: 12px;
+		background: var(--panel);
+		border: 1px solid var(--hairline);
+		border-radius: 4px;
+	}
+
+	label {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--text-dim);
 	}
 
 	input,
 	button {
+		min-height: 48px;
+		padding: 0 12px;
 		font: inherit;
-		padding: 0.75rem;
+		color: var(--text);
+		border: 1px solid var(--hairline);
+		border-radius: 4px;
+	}
+
+	input {
+		background: var(--matte);
+	}
+
+	button {
+		font-weight: 600;
+		color: var(--amber);
+		background: var(--panel-raised);
+		cursor: pointer;
+	}
+
+	p {
+		margin: 0;
+		color: var(--cut);
 	}
 </style>
