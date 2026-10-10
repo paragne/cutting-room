@@ -44,24 +44,19 @@
 
 ## Known issues
 
-- Login error text uses `--cut`, which breaks the Two Signals rule in DESIGN.md
-  (red only for trash). Pick a neutral color or amend the rule.
+- Login error text uses `--cut`, breaking the Two Signals rule (red only for trash).
 - `.timecode` and `.label` styles are duplicated per component, not in `theme.css`.
 - Mode name in the header is a static title until task 13 adds the mode picker.
-- Preload of the next 3 previews: confirm in the Network tab that the media proxy
-  sends cache headers so the browser reuses them (not checked).
-- `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
-  name, path and domain come from constants, so not reachable. Fixed only by Kit 3.
+- Preload of the next 3 previews: confirm the browser reuses them (cache headers).
+- `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Not reachable
+  (cookie name, path, domain are constants). Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
-- Favorite on a keep fetches the asset first (one extra `getAsset`), to avoid
-  unfavoriting an asset that was already a favorite when the user undoes.
+- Favorite on a keep costs one extra `getAsset`, so undo never unfavorites an existing favorite.
 - Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
 - Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2),
   `ADDRESS_HEADER`/`XFF_DEPTH` for the real proxy, and a check for HSTS and no
   `Vary: Origin` on media (seen in dev, likely Vite).
-- Migrations runner tracks only `user_version`, so a DB built from an edited
-  migration keeps the old schema. Delete `data/` after any pre-commit migration edit.
-- Queue is date ordered until task 12. A first page after a long reviewed run
-  costs one Immich search per 200 reviewed assets. Cursor allows at most 500
-  assets sharing one timestamp.
+- Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
+- Queue is date ordered until task 12. A first page after a long reviewed run costs
+  one Immich search per 200 reviewed assets. Cursor allows 500 assets per timestamp.
 
