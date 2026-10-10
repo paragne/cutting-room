@@ -26,20 +26,15 @@
 
 ## Done
 
-1-3. Scaffold (SvelteKit 2.70.3, adapter-node 5.5.7), Immich spike (server v3.2.0, @immich/sdk 3.2.0 pinned, docs/IMMICH-API.md), config and Immich client with startup check. Verified live.
-4a-4b. Auth: `auth.ts`, `guard.ts` (Origin check, 401 for /api), security headers, kit.csp, login page, /logout. Reviewed in browser.
-5. DB: migration 002 (decisions, daily_stats, settings), `recordDecision`/`removeDecision` in `db.ts`.
-6. Media proxy: `media.ts`, route `/media/[id]/[kind]` (thumbnail, preview, video). Verified live.
-7. Queue and decisions API: `queue.ts` (keyset cursor), `decide.ts`, /api/queue, /api/decide, /api/undo. Verified live.
-8. Design: PRODUCT.md, seed DESIGN.md (edit suite at 2am), swipe screen brief in `.impeccable/surfaces/`.
-9a. Swipe logic: `swipe.ts` (release rule, velocity), `deck.svelte.ts` (Deck class: current, upcoming 3, refill, undo history), `api.ts` client wrappers, 164 tests. No UI.
-9b. Swipe screen UI: `Card` (pointer drag, razor/slide exits, undo re-entry), `Timeline`, `Controls`, `AssetInfo` (date plus Details dropdown, `GET /api/asset/[id]`), `keys.ts`, `theme.css`, 401 redirects to /login, 175 tests. Reviewed in browser.
-9c. Login restyled with theme tokens, DESIGN.md regenerated from the built screens.
-
-10. Video in card (autoplay, muted, loop, Sound toggle), double-tap and F favorite and advance. Migration 003, 191 tests. Reviewed in browser.
-
-10b. GIFs play from the `original` kind (previews are stills). `QueueItem.isGif`
-    from `originalMimeType`. Key now has asset.download, documented. 194 tests. Confirmed in browser.
+1-3. Scaffold (SvelteKit 2.70.3, adapter-node 5.5.7), Immich spike (server v3.2.0, @immich/sdk 3.2.0, docs/IMMICH-API.md), config, Immich client with startup check.
+4. Auth (`auth.ts`, `guard.ts`, security headers, login, /logout).
+5. DB: migrations 002 (decisions, daily_stats, settings), 003 (favorite).
+6. Media proxy `media.ts`, `/media/[id]/[kind]` (thumbnail, preview, video, original).
+7. Queue and decisions API: keyset cursor, /api/queue, /api/decide, /api/undo.
+8. Design: PRODUCT.md, DESIGN.md, swipe screen brief in `.impeccable/surfaces/`.
+9. Swipe logic and screen (Card, Timeline, Controls, AssetInfo, keys), login restyle.
+10. Video in card, double-tap and F favorite.
+10b. GIFs play from `original` (previews are stills); `QueueItem.isGif`. Key has asset.download. 194 tests. Reviewed in browser.
 
 ## Open decisions
 
