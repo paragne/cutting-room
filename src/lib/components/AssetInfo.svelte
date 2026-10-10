@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { assetInfo } from '$lib/api';
+	import { assetInfo, originalFile } from '$lib/api';
+	import { shareOrDownload } from '$lib/share';
 	import { formatBytes, formatTaken } from '$lib/format';
 	import type { AssetInfo } from '$lib/server/assetInfo';
 	import type { QueueItem } from '$lib/server/queue';
@@ -22,6 +23,23 @@
 		return () => (stale = true);
 	});
 
+	let sharing = $state(false);
+	let shareFailed = $state(false);
+
+	async function share(event: MouseEvent) {
+		event.preventDefault();
+		if (sharing) return;
+		sharing = true;
+		shareFailed = false;
+		try {
+			await shareOrDownload(await originalFile(item.id));
+		} catch {
+			shareFailed = true;
+		} finally {
+			sharing = false;
+		}
+	}
+
 	const rows = $derived(
 		info
 			? ([
@@ -39,7 +57,12 @@
 <details class="info" bind:open>
 	<summary>
 		<time datetime={item.localDateTime}>{formatTaken(item.localDateTime)}</time>
-		<span class="label">Details</span>
+		<span class="end">
+			<span class="label">Details</span>
+			<button type="button" class="share" disabled={sharing} onclick={share}>
+				{sharing ? 'Preparing' : shareFailed ? 'Share failed' : 'Share'}
+			</button>
+		</span>
 	</summary>
 	{#if failed}
 		<p class="note">Details unavailable.</p>
@@ -69,6 +92,22 @@
 		padding: 0 12px;
 		font-weight: 500;
 		font-variant-numeric: tabular-nums;
+		cursor: pointer;
+	}
+	.end {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.share {
+		min-height: 36px;
+		padding: 0 12px;
+		border: 1px solid var(--hairline);
+		border-radius: 6px;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		font-size: 13px;
 		cursor: pointer;
 	}
 	.label {

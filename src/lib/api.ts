@@ -51,3 +51,10 @@ export async function undo(id: string): Promise<void> {
 export async function assetInfo(id: string): Promise<AssetInfo> {
 	return (await send(`/api/asset/${id}`)).json() as Promise<AssetInfo>;
 }
+
+/** The original bytes, named as in Immich, ready to share or download. */
+export async function originalFile(id: string): Promise<File> {
+	const [info, res] = await Promise.all([assetInfo(id), send(`/media/${id}/original`)]);
+	const blob = await res.blob();
+	return new File([blob], info.fileName, { type: blob.type });
+}
