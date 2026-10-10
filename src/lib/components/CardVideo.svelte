@@ -7,10 +7,15 @@
 	let { id }: { id: string } = $props();
 
 	let muted = $state(!sound);
+	let paused = $state(false);
 
 	function toggle() {
 		sound = muted;
 		muted = !muted;
+	}
+
+	export function togglePlay() {
+		paused = !paused;
 	}
 </script>
 
@@ -19,20 +24,20 @@
 	src="/media/{id}/video"
 	poster="/media/{id}/preview"
 	{muted}
+	bind:paused
 	autoplay
 	loop
 	playsinline
 	disablepictureinpicture
 ></video>
-<button
-	class="sound"
-	onpointerdown={(e) => e.stopPropagation()}
-	onclick={toggle}
-	aria-pressed={!muted}
->
-	{muted ? 'Sound off' : 'Sound on'}
-</button>
-<span class="kind">Video</span>
+<div class="buttons">
+	<button onpointerdown={(e) => e.stopPropagation()} onclick={togglePlay}>
+		{paused ? 'Play' : 'Pause'}
+	</button>
+	<button onpointerdown={(e) => e.stopPropagation()} onclick={toggle} aria-pressed={!muted}>
+		{muted ? 'Sound off' : 'Sound on'}
+	</button>
+</div>
 
 <style>
 	video {
@@ -41,23 +46,14 @@
 		object-fit: contain;
 		pointer-events: none;
 	}
-	.kind {
+	.buttons {
 		position: absolute;
 		left: 12px;
 		bottom: 12px;
-		padding: 4px 8px;
-		background: var(--panel);
-		border-radius: 2px;
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--text-dim);
+		display: flex;
+		gap: 8px;
 	}
-	.sound {
-		position: absolute;
-		right: 12px;
-		bottom: 12px;
+	button {
 		min-height: 48px;
 		padding: 0 12px;
 		font: inherit;

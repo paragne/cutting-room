@@ -44,14 +44,30 @@ export async function decide(id: string, action: Action): Promise<void> {
 	await post('/api/decide', { id, action, day: localDay(new Date()) });
 }
 
-/** Keeps the asset and sets its Immich favorite flag. */
-export async function favorite(id: string): Promise<void> {
-	await post('/api/decide', { id, action: 'keep', favorite: true, day: localDay(new Date()) });
+function put(path: string, body: object): Promise<Response> {
+	return send(path, {
+		method: 'PUT',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify(body)
+	});
 }
 
-/** Keeps the asset and adds it to an Immich album. */
-export async function addToAlbum(id: string, albumId: string): Promise<void> {
-	await post('/api/decide', { id, action: 'keep', albumId, day: localDay(new Date()) });
+/** Sets the Immich favorite flag. It records no decision. */
+export async function setFavorite(id: string, favorite: boolean): Promise<void> {
+	await put(`/api/asset/${id}/favorite`, { favorite });
+}
+
+/** The ids of the albums that hold the asset. */
+export async function albumsOf(id: string): Promise<string[]> {
+	const { albumIds } = (await (await send(`/api/asset/${id}/albums`)).json()) as {
+		albumIds: string[];
+	};
+	return albumIds;
+}
+
+/** Adds the asset to an album or removes it. It records no decision. */
+export async function setMember(id: string, albumId: string, member: boolean): Promise<void> {
+	await put(`/api/asset/${id}/albums`, { albumId, member });
 }
 
 export async function albums(): Promise<AlbumList> {
@@ -59,11 +75,7 @@ export async function albums(): Promise<AlbumList> {
 }
 
 export async function saveHotkeys(hotkeys: Hotkeys): Promise<void> {
-	await send('/api/albums', {
-		method: 'PUT',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({ hotkeys })
-	});
+	await put('/api/albums', { hotkeys });
 }
 
 export async function undo(id: string): Promise<void> {

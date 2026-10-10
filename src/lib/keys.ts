@@ -1,6 +1,6 @@
 import type { Action } from './server/db';
 
-export type Command = Action | 'undo' | 'favorite';
+export type Command = Action | 'undo' | 'favorite' | 'skip';
 
 interface KeyLike {
 	key: string;
@@ -22,5 +22,6 @@ export function command(e: KeyLike): Command | null {
 	if (e.key.toLowerCase() === 'f') return 'favorite';
 	if (e.key === 'ArrowRight') return 'keep';
 	if (e.key === 'ArrowLeft') return 'trash';
+	if (e.key === 'ArrowDown') return 'skip';
 	return null;
 }

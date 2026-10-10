@@ -6,12 +6,15 @@
 		open = $bindable(false),
 		albums,
 		hotkeys,
+		selected = [],
 		onpick,
 		onhotkeys
 	}: {
 		open: boolean;
 		albums: AlbumInfo[];
 		hotkeys: Hotkeys;
+		/** Albums that hold the asset; picking one toggles it. */
+		selected?: string[];
 		onpick: (albumId: string) => void;
 		onhotkeys: (hotkeys: Hotkeys) => void;
 	} = $props();
@@ -36,7 +39,11 @@
 		<ul>
 			{#each albums as album (album.id)}
 				<li>
-					<button class="pick" onclick={() => onpick(album.id)}>
+					<button
+						class="pick"
+						class:on={selected.includes(album.id)}
+						aria-pressed={selected.includes(album.id)}
+						onclick={() => onpick(album.id)}>
 						<span class="name">{album.name}</span>
 						<span class="count">{album.assetCount}</span>
 					</button>
@@ -99,6 +106,10 @@
 		justify-content: space-between;
 		gap: 8px;
 		text-align: left;
+	}
+	.pick.on {
+		color: var(--amber);
+		border-color: var(--amber);
 	}
 	.name {
 		overflow: hidden;

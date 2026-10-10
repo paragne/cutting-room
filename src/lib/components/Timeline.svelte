@@ -40,8 +40,8 @@
 	}
 	.playhead {
 		flex: none;
-		width: 2px;
-		margin-left: 2px;
+		width: 8px;
+		border-radius: 2px;
 		background: var(--amber);
 	}
 </style>

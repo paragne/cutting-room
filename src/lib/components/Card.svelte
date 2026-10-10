@@ -26,6 +26,7 @@
 	const RAZOR_MS = 120;
 
 	let el: HTMLDivElement;
+	let video = $state<ReturnType<typeof CardVideo>>();
 	let dx = $state(0);
 	let width = $state(1);
 	let dragging = $state(false);
@@ -88,10 +89,18 @@
 		else dx = 0;
 		const tap = { x: e.clientX, y: e.clientY, t: e.timeStamp };
 		if (!isTap(pressed, tap)) return;
+		if (inCenter(tap)) video?.togglePlay();
 		if (lastTap && isDoubleTap(lastTap, tap)) {
 			lastTap = null;
 			onfavorite();
 		} else lastTap = tap;
+	}
+
+	// The middle fifth of each side, so a tap on the buttons or the edges never lands here.
+	function inCenter(p: Point): boolean {
+		const r = el.getBoundingClientRect();
+		return Math.abs(p.x - (r.left + r.width / 2)) < r.width * 0.2 &&
+			Math.abs(p.y - (r.top + r.height / 2)) < r.height * 0.2;
 	}
 
 	function cancel() {
@@ -115,7 +124,7 @@
 	role="presentation"
 >
 	{#if item.type === 'VIDEO'}
-		<CardVideo id={item.id} />
+		<CardVideo bind:this={video} id={item.id} />
 	{:else}
 		<img src="/media/{item.id}/{item.isGif ? 'original' : 'preview'}" alt="Photo taken {item.localDateTime.slice(0, 10)}" draggable="false" />
 	{/if}

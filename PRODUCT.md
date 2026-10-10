@@ -49,6 +49,7 @@ Modes:
 
 - Shuffle all: random assets from the whole library. This is the default.
 - Photoshoot shuffle: shows one random photoshoot (a burst of photos taken together) and the user picks the best one or more, trashing the rest.
+- Clock in (start shift): swipe and photoshoot combined, entered with a short clocking-in animation. Swipe random photos; when the next one belongs to a burst, show the photoshoot view. Shifts run about 15 minutes, with whole-library progress shown between shifts.
 - On this day, single album, screenshots, and Immich duplicate groups (compare side by side, pick keepers).
 
 Open:

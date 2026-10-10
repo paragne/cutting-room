@@ -29,8 +29,7 @@ function fakeApi(pages: QueueItem[][]): {
 			return { items: pages[i] ?? [], cursor: i + 1 < pages.length ? String(i + 1) : null };
 		}),
 		decide: vi.fn(async () => {}),
-		favorite: vi.fn(async () => {}),
-		addToAlbum: vi.fn(async () => {}),
+		setFavorite: vi.fn(async () => {}),
 		undo: vi.fn(async () => {})
 	};
 }
@@ -55,47 +54,36 @@ describe('Deck', () => {
 		expect(deck.history).toEqual([{ item: item(0), action: 'trash' }]);
 	});
 
-	it('favorite advances as a keep through the favorite call', async () => {
+	it('favoriting keeps the card in place and records no decision', async () => {
 		const api = fakeApi([items(0, 20)]);
 		const deck = new Deck(api);
 		await deck.refill();
-		await deck.favorite();
-		expect(api.favorite).toHaveBeenCalledWith(item(0).id);
+		await deck.setFavorite(true);
+		expect(api.setFavorite).toHaveBeenCalledWith(item(0).id, true);
 		expect(api.decide).not.toHaveBeenCalled();
-		expect(deck.current).toEqual(item(1));
-		expect(deck.history).toEqual([{ item: item(0), action: 'keep' }]);
-	});
-
-	it('addToAlbum advances as a keep through the album call', async () => {
-		const api = fakeApi([items(0, 20)]);
-		const deck = new Deck(api);
-		await deck.refill();
-		await deck.addToAlbum('album-1');
-		expect(api.addToAlbum).toHaveBeenCalledWith(item(0).id, 'album-1');
-		expect(deck.current).toEqual(item(1));
-		expect(deck.history).toEqual([{ item: item(0), action: 'keep' }]);
-	});
-
-	it('stays on the card when adding to the album fails', async () => {
-		const api = fakeApi([items(0, 20)]);
-		api.addToAlbum.mockRejectedValueOnce(new Error('album refused'));
-		const deck = new Deck(api);
-		await deck.refill();
-		await deck.addToAlbum('album-1');
-		expect(deck.current).toEqual(item(0));
+		expect(deck.current?.id).toBe(item(0).id);
+		expect(deck.current?.isFavorite).toBe(true);
 		expect(deck.history).toEqual([]);
-		expect(deck.error).toBe('album refused');
 	});
 
-	it('stays on the card when favorite fails', async () => {
+	it('does not mark the card favorite when the request fails', async () => {
 		const api = fakeApi([items(0, 20)]);
-		api.favorite.mockRejectedValueOnce(new Error('immich down'));
+		api.setFavorite.mockRejectedValueOnce(new Error('immich down'));
 		const deck = new Deck(api);
 		await deck.refill();
-		await deck.favorite();
-		expect(deck.current).toEqual(item(0));
-		expect(deck.history).toEqual([]);
+		await deck.setFavorite(true);
+		expect(deck.current?.isFavorite).toBe(false);
 		expect(deck.error).toBe('immich down');
+	});
+
+	it('skip moves on without a decision or history', async () => {
+		const api = fakeApi([items(0, 20)]);
+		const deck = new Deck(api);
+		await deck.refill();
+		deck.skip();
+		expect(deck.current).toEqual(item(1));
+		expect(api.decide).not.toHaveBeenCalled();
+		expect(deck.history).toEqual([]);
 	});
 
 	it('fetches the next page once few cards remain', async () => {

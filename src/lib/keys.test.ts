@@ -12,6 +12,11 @@ describe('command', () => {
 		expect(press('ArrowLeft')).toBe('trash');
 	});
 
+	it('skips on down', () => {
+		expect(press('ArrowDown')).toBe('skip');
+		expect(press('ArrowDown', { ctrlKey: true })).toBeNull();
+	});
+
 	it('favorites on F in either case, but not with a modifier', () => {
 		expect(press('f')).toBe('favorite');
 		expect(press('F')).toBe('favorite');

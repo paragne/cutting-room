@@ -1,17 +1,13 @@
 <script lang="ts">
 	let {
 		busy,
-		canUndo,
 		ontrash,
-		onundo,
-		onalbum,
+		onskip,
 		onkeep
 	}: {
 		busy: boolean;
-		canUndo: boolean;
 		ontrash: () => void;
-		onundo: () => void;
-		onalbum: () => void;
+		onskip: () => void;
 		onkeep: () => void;
 	} = $props();
 </script>
@@ -20,11 +16,8 @@
 	<button class="trash" aria-disabled={busy} onclick={ontrash}>
 		Trash <kbd>←</kbd>
 	</button>
-	<button class="undo" aria-disabled={busy || !canUndo} onclick={onundo}>
-		Undo <kbd>Ctrl Z</kbd>
-	</button>
-	<button class="album" aria-disabled={busy} onclick={onalbum}>
-		Album <kbd>0-9</kbd>
+	<button class="skip" aria-disabled={busy} onclick={onskip}>
+		Skip <kbd>↓</kbd>
 	</button>
 	<button class="keep" aria-disabled={busy} onclick={onkeep}>
 		Keep <kbd>→</kbd>
@@ -34,7 +27,7 @@
 <style>
 	.controls {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 		gap: 8px;
 		padding: 12px;
 		background: var(--panel);

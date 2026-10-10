@@ -10,8 +10,7 @@ export interface Page {
 export interface DeckApi {
 	page(cursor: string | null): Promise<Page>;
 	decide(id: string, action: Action): Promise<void>;
-	favorite(id: string): Promise<void>;
-	addToAlbum(id: string, albumId: string): Promise<void>;
+	setFavorite(id: string, favorite: boolean): Promise<void>;
 	undo(id: string): Promise<void>;
 }
 
@@ -79,14 +78,21 @@ export class Deck {
 		return this.#commit(action, (id) => this.#api.decide(id, action));
 	}
 
-	/** Keeps the current card and favorites it in Immich. */
-	favorite(): Promise<void> {
-		return this.#commit('keep', (id) => this.#api.favorite(id));
+	/** Sets the Immich favorite flag on the current card, which stays in place. */
+	setFavorite(favorite: boolean): Promise<void> {
+		const item = this.current;
+		if (!item || this.busy) return Promise.resolve();
+		return this.#step(async () => {
+			await this.#api.setFavorite(item.id, favorite);
+			item.isFavorite = favorite;
+		});
 	}
 
-	/** Keeps the current card and adds it to an album. */
-	addToAlbum(albumId: string): Promise<void> {
-		return this.#commit('keep', (id) => this.#api.addToAlbum(id, albumId));
+	/** Moves past the current card without deciding it; it may come up again later. */
+	skip(): void {
+		if (this.busy || !this.current) return;
+		this.#cards.shift();
+		void this.refill();
 	}
 
 	async #commit(action: Action, send: (id: string) => Promise<void>): Promise<void> {
