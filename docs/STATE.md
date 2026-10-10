@@ -45,17 +45,15 @@
 ## Known issues
 
 - Login error text uses `--cut`, breaking the Two Signals rule (red only for trash).
-- `.timecode` and `.label` styles are duplicated per component, not in `theme.css`.
-- Mode name in the header is a static title until task 13 adds the mode picker.
+- `.timecode` and `.label` styles are duplicated per component. Header mode name is static until 13.
 - Preload of the next 3 previews: confirm the browser reuses them (cache headers).
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Not reachable
   (cookie name, path, domain are constants). Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
 - Favorite on a keep costs one extra `getAsset`, so undo never unfavorites an existing favorite.
 - Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
-- Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2),
-  `ADDRESS_HEADER`/`XFF_DEPTH` for the real proxy, and a check for HSTS and no
-  `Vary: Origin` on media (seen in dev, likely Vite).
+- Task 16: needs prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/
+  `XFF_DEPTH`, and a check for HSTS and no `Vary: Origin` on media.
 - Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
 - Queue is date ordered until task 12. A first page after a long reviewed run costs
   one Immich search per 200 reviewed assets. Cursor allows 500 assets per timestamp.
