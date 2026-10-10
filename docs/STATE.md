@@ -1,12 +1,10 @@
 # State
 
 ## Current task
-9c. Restyle login to match (see task list).
+10. Video playback in card, double-tap and F to favorite.
 
 ## Tasks (one per session, in order)
 
-9c. Restyle login to match, then regenerate DESIGN.md from the built screen
-    (tokens now live in `src/lib/theme.css`).
 10. Video playback in card, double-tap and F to favorite. I review.
 11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
 12. Modes: shuffle all (the default), on this day (date range per past
@@ -32,6 +30,7 @@
 8. Design: PRODUCT.md, seed DESIGN.md (edit suite at 2am), swipe screen brief in `.impeccable/surfaces/`.
 9a. Swipe logic: `swipe.ts` (release rule, velocity), `deck.svelte.ts` (Deck class: current, upcoming 3, refill, undo history), `api.ts` client wrappers, 164 tests. No UI.
 9b. Swipe screen UI: `Card` (pointer drag, razor/slide exits, undo re-entry), `Timeline`, `Controls`, `AssetInfo` (date plus Details dropdown, `GET /api/asset/[id]`), `keys.ts`, `theme.css`, 401 redirects to /login, 175 tests. Reviewed in browser.
+9c. Login restyled with theme tokens, DESIGN.md regenerated from the built screens.
 
 ## Open decisions
 
@@ -41,6 +40,9 @@
 
 ## Known issues
 
+- Login error text uses `--cut`, which breaks the Two Signals rule in DESIGN.md
+  (red only for trash). Pick a neutral color or amend the rule.
+- `.timecode` and `.label` styles are duplicated per component, not in `theme.css`.
 - Mode name in the header is a static title until task 13 adds the mode picker.
 - Preload of the next 3 previews: confirm in the Network tab that the media proxy
   sends cache headers so the browser reuses them (not checked).

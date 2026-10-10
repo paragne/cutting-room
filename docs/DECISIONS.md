@@ -55,3 +55,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-09: Asset details come from a separate `GET /api/asset/[id]` fetched only while the Details panel is open, returning six chosen fields. Putting them in the queue DTO would cost an Immich `getAssetInfo` per queued asset.
 - 2026-10-09: Card styles set transforms through the `style:` directive (CSSOM), not inline style attributes, because `style-src 'self'` blocks the latter.
 - 2026-10-09: Keep and trash timeline blocks share one shape and differ by color only, at the user's request.
+- 2026-10-10: Login uses the shared theme tokens and imports `theme.css` itself, since it does not render under the swipe page. Its error text stays `--cut` for now, flagged as a conflict with Two Signals.
