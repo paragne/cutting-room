@@ -68,3 +68,8 @@ Append only. One line per decision, with the reason.
 - 2026-10-10: Shuffle uses `searchRandom` and a constant cursor, since Immich random search has no seed or paging. The Deck drops repeats, and the server ends the queue after 3 random batches that are all reviewed.
 - 2026-10-10: On this day sends the client's local date as `day`, like `/api/decide`, so the server needs no timezone setting. Past years are scanned newest first, oldest first within a year, and the cursor is `year.keysetCursor`.
 - 2026-10-10: `/api/queue` takes `mode` and `album`, defaulting to shuffle. The `order` param is gone: album and on this day are always oldest first.
+- 2026-10-10: A photoshoot is a run of shots no more than 60 s apart, at least 3, at most 16 nearest the seed, found in a 10 minute window around a random asset. Time gap only: location adds little for bursts and needs no extra Immich data.
+- 2026-10-10: Favorite and album changes are immediate Immich calls that record no decision. Only keep and trash advance a card and mark it reviewed; skip advances without a decision. This replaces the earlier rule that favorite and album counted as a keep.
+- 2026-10-10: The key gains albumAsset.delete so the album sheet can toggle membership. It cannot delete albums or assets.
+- 2026-10-10: Burst decisions go out one request per shot after "Keep N, trash M", and burst undo takes back only the last settled burst, client side, by undoing each shot.
+- 2026-10-10: Main mode is named "Clock in" (start shift), planned as task 13b with a clocking-in animation.
