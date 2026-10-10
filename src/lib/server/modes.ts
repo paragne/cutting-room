@@ -2,7 +2,10 @@ import type { DateFilter } from '@immich/sdk';
 import { isUuid } from './media';
 
 export type Mode =
-	{ kind: 'shuffle' } | { kind: 'onThisDay'; day: string } | { kind: 'album'; albumId: string };
+	| { kind: 'shuffle' }
+	| { kind: 'photoshoot' }
+	| { kind: 'onThisDay'; day: string }
+	| { kind: 'album'; albumId: string };
 
 // Years before this are not searched. Each empty year costs one Immich search.
 export const MIN_YEAR = 1990;
@@ -22,7 +25,7 @@ function yearOf(day: string): number | null {
 /** Returns null when the query names an unknown mode or lacks a valid argument for it. */
 export function parseMode(params: URLSearchParams): Mode | null {
 	const kind = params.get('mode') ?? 'shuffle';
-	if (kind === 'shuffle') return { kind };
+	if (kind === 'shuffle' || kind === 'photoshoot') return { kind };
 	if (kind === 'onThisDay') {
 		const day = params.get('day');
 		return day !== null && yearOf(day) !== null ? { kind, day } : null;

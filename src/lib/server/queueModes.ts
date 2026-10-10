@@ -1,6 +1,8 @@
 import type { Db } from './db';
-import { searchRandom } from './immich';
+import { AssetOrder, SearchOrderField } from '@immich/sdk';
+import { searchAssets, searchRandom } from './immich';
 import { firstPastYear, MIN_YEAR, onThisDayRange, type Mode } from './modes';
+import { photoshootAround } from './photoshoot';
 import {
 	decodeCursor,
 	encodeCursor,
@@ -34,6 +36,43 @@ async function shuffle(db: Db): Promise<ModePage> {
 		if (items.length > 0) return { items, cursor: SHUFFLE_CURSOR };
 	}
 	return { items: [], cursor: null };
+}
+
+const SEED_BATCH = 10;
+// Bursts are found by a time window around a random asset; it must exceed the shot gap.
+const WINDOW_MS = 10 * 60_000;
+const WINDOW_SIZE = 200;
+const PHOTOSHOOT_CURSOR = 'photoshoot';
+
+// One photoshoot per page: random assets are tried as seeds until one sits in a run of
+// unreviewed shots. Trashed and kept shots are skipped, so a half-reviewed burst shrinks.
+async function photoshoot(db: Db): Promise<ModePage> {
+	const seeds = await searchRandom({ filter: {}, size: SEED_BATCH });
+	for (const seed of seeds) {
+		const t = Date.parse(seed.fileCreatedAt);
+		const near = await searchAssets({
+			filter: {
+				takenAt: {
+					gte: new Date(t - WINDOW_MS).toISOString(),
+					lt: new Date(t + WINDOW_MS + 1).toISOString()
+				}
+			},
+			orderBy: { field: SearchOrderField.FileCreatedAt, direction: AssetOrder.Asc },
+			size: WINDOW_SIZE
+		});
+		const reviewed = new Set(
+			db.reviewedAmong.all(JSON.stringify(near.map((a) => a.id))).map((r) => r.assetId)
+		);
+		const open = near.filter((a) => !reviewed.has(a.id));
+		const shoot = photoshootAround(
+			open.map((a) => ({ id: a.id, at: Date.parse(a.fileCreatedAt) })),
+			seed.id
+		);
+		if (shoot === null) continue;
+		const byId = new Map(open.map((a) => [a.id, a]));
+		return { items: shoot.map((s) => toItem(byId.get(s.id)!)), cursor: PHOTOSHOOT_CURSOR };
+	}
+	return { items: [], cursor: PHOTOSHOOT_CURSOR };
 }
 
 // On this day: past years newest first, oldest first within a year. The cursor
@@ -89,6 +128,8 @@ export function nextPage(db: Db, mode: Mode, raw: string | null): Promise<ModePa
 	switch (mode.kind) {
 		case 'shuffle':
 			return raw === null || raw === SHUFFLE_CURSOR ? shuffle(db) : Promise.resolve(null);
+		case 'photoshoot':
+			return raw === null || raw === PHOTOSHOOT_CURSOR ? photoshoot(db) : Promise.resolve(null);
 		case 'onThisDay':
 			return onThisDay(db, mode.day, raw);
 		case 'album':

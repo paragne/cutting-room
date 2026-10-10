@@ -93,6 +93,51 @@ describe('shuffle', () => {
 	});
 });
 
+describe('photoshoot', () => {
+	const mode = { kind: 'photoshoot' } as const;
+	const at = (s: number) => new Date(Date.UTC(2024, 5, 1, 12, 0, s)).toISOString();
+
+	it('returns the burst around a random seed in time order', async () => {
+		const burst = [asset(3, at(20)), asset(1, at(0)), asset(2, at(10))];
+		library = [...burst, asset(9, at(3600))];
+		vi.mocked(searchRandom).mockResolvedValue([burst[0] as AssetResponseDto]);
+		const page = await nextPage(db, mode, null);
+		expect(ids(page!.items)).toEqual([burst[1]!.id, burst[2]!.id, burst[0]!.id]);
+		expect(page!.cursor).not.toBeNull();
+	});
+
+	it('tries the next seed when one is alone', async () => {
+		const lone = asset(9, at(3600));
+		const burst = [asset(1, at(0)), asset(2, at(5)), asset(3, at(10))];
+		library = [lone, ...burst];
+		vi.mocked(searchRandom).mockResolvedValue([lone, burst[1] as AssetResponseDto]);
+		const page = await nextPage(db, mode, null);
+		expect(ids(page!.items)).toEqual(ids(burst));
+	});
+
+	it('leaves out shots that are already reviewed', async () => {
+		const burst = [asset(1, at(0)), asset(2, at(5)), asset(3, at(10)), asset(4, at(15))];
+		library = burst;
+		keep(burst[3] as AssetResponseDto);
+		vi.mocked(searchRandom).mockResolvedValue([burst[0] as AssetResponseDto]);
+		const page = await nextPage(db, mode, null);
+		expect(ids(page!.items)).toEqual(ids(burst.slice(0, 3)));
+	});
+
+	it('returns no items, but keeps going, when no seed is in a burst', async () => {
+		const lone = asset(9, at(3600));
+		library = [lone];
+		vi.mocked(searchRandom).mockResolvedValue([lone]);
+		const page = await nextPage(db, mode, null);
+		expect(page!.items).toEqual([]);
+		expect(page!.cursor).not.toBeNull();
+	});
+
+	it('rejects a cursor it did not produce', async () => {
+		expect(await nextPage(db, mode, 'x')).toBeNull();
+	});
+});
+
 describe('onThisDay', () => {
 	const mode = { kind: 'onThisDay', day: '2026-10-10' } as const;
 

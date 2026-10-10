@@ -34,6 +34,8 @@ The SDK sends the key as the `x-api-key` header.
 | Favorite | `updateAsset` with `isFavorite` | PUT /assets/{id} | asset.update | Live |
 | List albums | `getAllAlbums` | GET /albums | album.read | Source (403 with test key) |
 | Add to album | `addAssetsToAlbum` | PUT /albums/{id}/assets | albumAsset.create | Source |
+| Albums holding an asset | `getAllAlbums` with `assetId` | GET /albums?assetId= | album.read | Source |
+| Remove from album | `removeAssetFromAlbum` | DELETE /albums/{id}/assets | albumAsset.delete | Source |
 | Duplicate groups | `getAssetDuplicates` | GET /duplicates | duplicate.read | Source (403 with test key) |
 | Thumbnail | `viewAsset` with `size: thumbnail` | GET /assets/{id}/thumbnail | asset.view | Live |
 | Preview | `viewAsset` with `size: preview` | GET /assets/{id}/thumbnail | asset.view | Live |
@@ -44,10 +46,12 @@ Restore needs `asset.delete`, not `asset.update`.
 ## API key permissions for the app
 
 `asset.read`, `asset.update`, `asset.delete`, `asset.view`, `asset.statistics`,
-`album.read`, `albumAsset.create`, `duplicate.read`, `asset.download`. Nothing else.
+`album.read`, `albumAsset.create`, `albumAsset.delete`, `duplicate.read`, `asset.download`.
+Nothing else.
 
 `asset.download` is for the `original` media kind: GIF playback (previews are
-stills) and the share button. Do not grant `library.*` or `duplicate.delete`.
+stills) and the share button. `albumAsset.delete` lets the app take an asset out of an album (the album sheet toggles
+membership). It cannot delete an album or an asset. Do not grant `library.*` or `duplicate.delete`.
 
 ## Search (v3.2 structured shape)
 

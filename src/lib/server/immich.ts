@@ -125,6 +125,17 @@ export async function addToAlbum(albumId: string, ids: string[]): Promise<BulkId
 	return sdk.addAssetsToAlbum({ id: albumId, bulkIdsDto: { ids } });
 }
 
+export async function getAlbumIdsOf(assetId: string): Promise<string[]> {
+	connect();
+	return (await sdk.getAllAlbums({ assetId })).map((a) => a.id);
+}
+
+// Per-id results, like addToAlbum.
+export async function removeFromAlbum(albumId: string, ids: string[]): Promise<BulkIdResponseDto[]> {
+	connect();
+	return sdk.removeAssetFromAlbum({ id: albumId, bulkIdsDto: { ids } });
+}
+
 export async function getDuplicates(): Promise<DuplicateResponseDto[]> {
 	connect();
 	return sdk.getAssetDuplicates();
