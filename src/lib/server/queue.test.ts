@@ -2,7 +2,7 @@ import type { AssetResponseDto } from '@immich/sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { openDb, type Db } from './db';
 import { searchAssets } from './immich';
-import { decodeCursor, encodeCursor, nextPage, PAGE_SIZE, type Order } from './queue';
+import { decodeCursor, encodeCursor, scanPage, PAGE_SIZE, type Order } from './queue';
 
 vi.mock('./immich', () => ({ searchAssets: vi.fn() }));
 
@@ -48,7 +48,7 @@ async function drain(db: Db, order: Order, onPage?: (ids: string[]) => void): Pr
 	const seen: string[] = [];
 	let cursor = null;
 	do {
-		const page = await nextPage(db, order, cursor);
+		const page = await scanPage(db, {}, order, cursor);
 		expect(page.items.length).toBeLessThanOrEqual(PAGE_SIZE);
 		seen.push(...page.items.map((i) => i.id));
 		onPage?.(page.items.map((i) => i.id));
@@ -76,7 +76,7 @@ beforeEach(() => {
 	library = [];
 });
 
-describe('nextPage', () => {
+describe('scanPage', () => {
 	it.each([1, 3, 7, 45])('walks oldest first with ties of %i, no skips or repeats', async (tie) => {
 		library = makeLibrary(250, tie);
 		expect(await drain(db, 'oldest')).toEqual(library.map((a) => a.id));
@@ -97,7 +97,7 @@ describe('nextPage', () => {
 			db,
 			library.slice(0, 650).map((a) => a.id)
 		);
-		const page = await nextPage(db, 'oldest', null);
+		const page = await scanPage(db, {}, 'oldest', null);
 		expect(page.items.map((i) => i.id)).toEqual(
 			library.slice(650, 650 + PAGE_SIZE).map((a) => a.id)
 		);
@@ -113,12 +113,12 @@ describe('nextPage', () => {
 	});
 
 	it('ends with a null cursor', async () => {
-		expect(await nextPage(db, 'oldest', null)).toEqual({
+		expect(await scanPage(db, {}, 'oldest', null)).toEqual({
 			items: [],
 			cursor: null
 		});
 		library = makeLibrary(5);
-		const page = await nextPage(db, 'newest', null);
+		const page = await scanPage(db, {}, 'newest', null);
 		expect(page.items).toHaveLength(5);
 		expect(page.cursor).toBeNull();
 	});
@@ -129,7 +129,7 @@ describe('nextPage', () => {
 			originalPath: '/library/x.jpg',
 			ownerId: uuid(9)
 		}));
-		const [item] = (await nextPage(db, 'oldest', null)).items;
+		const [item] = (await scanPage(db, {}, 'oldest', null)).items;
 		expect(Object.keys(item!).sort()).toEqual([
 			'duration',
 			'id',
@@ -173,7 +173,7 @@ describe('GIF flag', () => {
 		['image/jpeg', false]
 	])('marks %s as isGif=%s', async (originalMimeType, isGif) => {
 		library = makeLibrary(1).map((a) => ({ ...a, originalMimeType })) as AssetResponseDto[];
-		const [item] = (await nextPage(db, 'oldest', null)).items;
+		const [item] = (await scanPage(db, {}, 'oldest', null)).items;
 		expect(item!.isGif).toBe(isGif);
 	});
 });

@@ -63,9 +63,13 @@ export class Deck {
 		this.#fetching ??= this.#report(async () => {
 			while (!this.#exhausted && this.#cards.length <= LOW_WATER) {
 				const page = await this.#api.page(this.#cursor);
-				this.#cards.push(...page.items);
+				// Shuffle batches are random, so a page can repeat cards already in the deck.
+				const fresh = page.items.filter((i) => !this.#cards.some((c) => c.id === i.id));
+				this.#cards.push(...fresh);
 				this.#cursor = page.cursor;
 				this.#exhausted = page.cursor === null;
+				// Nothing new means the queue holds only cards we have; waiting beats polling Immich.
+				if (fresh.length === 0 && this.#cards.length > 0) break;
 			}
 		}).finally(() => (this.#fetching = null));
 		return this.#fetching;

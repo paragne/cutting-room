@@ -1,6 +1,6 @@
 import { AssetOrder, SearchOrderField, type AssetResponseDto, type DateFilter } from '@immich/sdk';
 import type { Db } from './db';
-import { searchAssets } from './immich';
+import { searchAssets, type AssetFilter } from './immich';
 import { isUuid } from './media';
 
 export type Order = 'oldest' | 'newest';
@@ -68,7 +68,7 @@ function pass(c: Cursor | null, a: AssetResponseDto): Cursor {
 	return { t: a.fileCreatedAt, ids: [a.id] };
 }
 
-function toItem(a: AssetResponseDto): QueueItem {
+export function toItem(a: AssetResponseDto): QueueItem {
 	return {
 		id: a.id,
 		type: a.type,
@@ -79,9 +79,13 @@ function toItem(a: AssetResponseDto): QueueItem {
 	};
 }
 
-/** Next page of unreviewed timeline assets. A null cursor in the result means the end. */
-export async function nextPage(
+/**
+ * Next page of unreviewed timeline assets matching `scope`. A null cursor in the
+ * result means the end. `scope.takenAt` bounds the scan; the cursor tightens it.
+ */
+export async function scanPage(
 	db: Db,
+	scope: AssetFilter,
 	order: Order,
 	cursor: Cursor | null
 ): Promise<{ items: QueueItem[]; cursor: Cursor | null }> {
@@ -90,7 +94,7 @@ export async function nextPage(
 	while (items.length < PAGE_SIZE) {
 		const size = BATCH_SIZE + (c?.ids.length ?? 0);
 		const assets = await searchAssets({
-			filter: c ? { takenAt: takenAtBound(order, c.t) } : {},
+			filter: c ? { ...scope, takenAt: { ...scope.takenAt, ...takenAtBound(order, c.t) } } : scope,
 			orderBy: {
 				field: SearchOrderField.FileCreatedAt,
 				direction: order === 'oldest' ? AssetOrder.Asc : AssetOrder.Desc

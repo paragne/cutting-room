@@ -118,6 +118,16 @@ describe('Deck', () => {
 		expect(deck.current).toEqual(item(0));
 	});
 
+	it('drops cards it already holds and stops asking when a page adds none', async () => {
+		const api = fakeApi([items(0, 3)]);
+		api.page.mockImplementation(async () => ({ items: items(0, 3), cursor: 'more' }));
+		const deck = new Deck(api);
+		await deck.refill();
+		expect(api.page).toHaveBeenCalledTimes(2);
+		expect(deck.current).toEqual(item(0));
+		expect(deck.upcoming).toEqual([item(1), item(2)]);
+	});
+
 	it('keeps fetching past pages that came back empty', async () => {
 		const deck = new Deck(fakeApi([[], [], items(0, 10)]));
 		await deck.refill();

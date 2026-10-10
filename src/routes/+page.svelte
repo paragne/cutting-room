@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import '$lib/theme.css';
 	import * as api from '$lib/api';
@@ -15,7 +16,10 @@
 	import type { AlbumList } from '$lib/server/albums';
 	import type { Action } from '$lib/server/db';
 
-	const deck = new Deck(api);
+	const modeQuery = new URLSearchParams(
+		[...page.url.searchParams].filter(([key]) => key === 'mode' || key === 'album')
+	);
+	const deck = new Deck({ ...api, page: (cursor) => api.page(cursor, modeQuery) });
 	let card = $state<ReturnType<typeof Card>>();
 	let from = $state<Action | null>(null);
 	let loaded = $state(false);
