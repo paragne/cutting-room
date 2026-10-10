@@ -56,3 +56,7 @@ Append only. One line per decision, with the reason.
 - 2026-10-09: Card styles set transforms through the `style:` directive (CSSOM), not inline style attributes, because `style-src 'self'` blocks the latter.
 - 2026-10-09: Keep and trash timeline blocks share one shape and differ by color only, at the user's request.
 - 2026-10-10: Login uses the shared theme tokens and imports `theme.css` itself, since it does not render under the swipe page. Its error text stays `--cut` for now, flagged as a conflict with Two Signals.
+- 2026-10-10: Favorite is a keep with `favorite: true` on `/api/decide`, not its own endpoint, so the Immich call and the decision succeed or fail together.
+- 2026-10-10: `decisions.favorite` is 1 only when we turned the flag on. Undo clears it only then, so undoing never removes a favorite the user set in Immich.
+- 2026-10-10: Videos autoplay muted and loop; sound is opt in through a button, because browsers block unmuted autoplay. The choice lasts for the session.
+- 2026-10-10: Share is split out as task 10c, and GIF autoplay as 10b. Share needs an original-file proxy kind and the API key's download permission, which is more than one change.

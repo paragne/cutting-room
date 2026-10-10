@@ -1,11 +1,16 @@
 # State
 
 ## Current task
-10. Video playback in card, double-tap and F to favorite.
+10b. GIFs autoplay and loop in the card (reported broken). Then 10c share.
 
 ## Tasks (one per session, in order)
 
-10. Video playback in card, double-tap and F to favorite. I review.
+10b. GIFs: broken in the app today. Must autoplay and loop in the card. Check
+    what the preview proxy serves for a GIF (Immich may send a still frame).
+10c. Share button: prepare the original photo or video. Desktop downloads it,
+    mobile opens the share sheet (navigator.share with files, needs HTTPS).
+    Needs an `original` kind in the media proxy (never `fullsize`, see immich.ts)
+    and a check that the API key may download originals.
 11. Add to album: picker sheet, 0-9 hotkeys stored in settings. I review.
 12. Modes: shuffle all (the default), on this day (date range per past
     year), single album.
@@ -32,6 +37,8 @@
 9b. Swipe screen UI: `Card` (pointer drag, razor/slide exits, undo re-entry), `Timeline`, `Controls`, `AssetInfo` (date plus Details dropdown, `GET /api/asset/[id]`), `keys.ts`, `theme.css`, 401 redirects to /login, 175 tests. Reviewed in browser.
 9c. Login restyled with theme tokens, DESIGN.md regenerated from the built screens.
 
+10. Video in card (autoplay, muted, loop, Sound toggle), double-tap and F favorite and advance. Migration 003, 191 tests. Reviewed in browser.
+
 ## Open decisions
 
 - Shuffle mode efficiency once most of the library is reviewed.
@@ -49,6 +56,8 @@
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Cookie
   name, path and domain come from constants, so not reachable. Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
+- Favorite on a keep fetches the asset first (one extra `getAsset`), to avoid
+  unfavoriting an asset that was already a favorite when the user undoes.
 - Not tested live: `addAssetsToAlbum`, startup with server trash disabled.
 - Task 16: image needs production node_modules (better-sqlite3, @node-rs/argon2),
   `ADDRESS_HEADER`/`XFF_DEPTH` for the real proxy, and a check for HSTS and no
