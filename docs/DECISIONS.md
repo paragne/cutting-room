@@ -75,3 +75,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-10: Main mode is named "Clock in" (start shift), planned as task 13b with a clocking-in animation.
 - 2026-10-11: Home shows percent sorted as reviewed / (library now + trashed by us), since trashed assets leave Immich's count. Space trashed comes from `decisions.bytes`, not Immich's trash, so outside deletions and the 30 day purge do not change it. No `/api/stats`: the page load reads the DB.
 - 2026-10-11: Clock in has its own queue function and response shape, `{entries}` of card or burst, since the other modes return flat `{items}`; both reuse `shootAround` so burst rules stay in one place.
+- 2026-10-11: Clock in screen keeps its own queue class (`Clockin`) and shares album, favorite and share state through `AssetTools`, so `/swipe` and `/photoshoot` stay untouched until they are moved over; `ShootHeader` is reused with `title` and `home` props.

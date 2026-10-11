@@ -1,13 +1,12 @@
 # State
 
 ## Current task
-13b(b). Clock in: the combined screen. Consume `/api/queue?mode=clockin` entries, show a card or the photoshoot view, return to swipe.
+13b(c). Clock in: shift timer (~15 minutes), clock-in animation (card slides into a
+time-clock slot, stamps the time; reduced motion: fade) and between-shift summary
+(whole-library reviewed, trashed, space freed). Split into its own sessions if too big
+(timer and summary first, animation after).
 
 ## Tasks (one per session, in order)
-13b. Clock in (also called Start shift): swipe plus photoshoot in ~15 minute shifts.
-    (b) the combined screen, (c) shift timer, clock-in animation (card slides into a
-    time-clock slot, stamps the time; reduced motion: fade) and between-shift summary
-    (whole-library reviewed, trashed, space freed). Each is its own session.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
     with deleteAssets (never resolveDuplicates).
 15. Screenshots mode: heuristic (no camera make, screen-ratio dimensions,
@@ -19,18 +18,13 @@
 
 ## Done
 
-1-9. Scaffold, Immich spike (server v3.2.0, @immich/sdk 3.2.0, docs/IMMICH-API.md), config, Immich client, auth, DB (migrations 002, 003), media proxy, queue and decisions API, design docs, swipe screen.
-10. Video in card, double-tap and F favorite.
-10b. GIFs play from `original` (previews are stills); `QueueItem.isGif`. Key has asset.download. 194 tests. Reviewed in browser.
-10c. Share button in the Details row: `share.ts`, `originalFile` in `api.ts`. Shares via navigator.share, else downloads. 197 tests. Desktop and HTTPS phone reviewed.
-11. Add to album: `albums.ts`, `/api/albums`, `albumId` on `/api/decide` (a keep), `AlbumSheet`, `albumKeys.ts`, digit hotkeys in settings. 225 tests. Reviewed in browser.
-12. Modes: `modes.ts` (parse, on-this-day ranges), `queueModes.ts` (shuffle, on this day, album), `?mode=` and `&album=` on `/` and `/api/queue`. 256 tests. Reviewed in browser.
-12b. Photoshoot at `/photoshoot`: `photoshoot.ts` (60 s gap, 3 to 16 shots), `mode=photoshoot`, pick keepers, Trash all, one-level burst undo, fullscreen. Reviewed in browser.
-12c. Swipe actions: heart, album, details, share on the card; skip; undo overlay. Favorite and album are immediate (`assetActions.ts`, `/api/asset/[id]/favorite|albums`). Key gained albumAsset.delete. 279 tests. Reviewed in browser.
-
-13. Home screen at `/`: `stats.ts` (percent sorted, streak), `ModePicker`, load in `+page.server.ts`. Swipe moved to `/swipe`, header shows the mode name. 288 tests. Reviewed in browser.
-
-13b(a). Clock in queue: `clockin.ts` (`QueueEntry` card or burst), `shootAround` shared with photoshoot, `mode=clockin`. 295 tests. API only, no UI yet.
+1-9. Scaffold, Immich spike (server v3.2.0, @immich/sdk 3.2.0, docs/IMMICH-API.md), config, Immich client, auth, DB, media proxy, queue and decisions API, design docs, swipe screen.
+10, 10b, 10c. Video in card, double-tap and F favorite, GIFs from `original`, share button.
+11. Add to album: `albums.ts`, `/api/albums`, `AlbumSheet`, `albumKeys.ts`, digit hotkeys.
+12, 12b, 12c. Modes (`modes.ts`, `queueModes.ts`), photoshoot at `/photoshoot`, swipe actions (heart, album, details, share, skip, undo).
+13. Home screen at `/`: `stats.ts`, `ModePicker`; swipe moved to `/swipe`.
+13b(a). Clock in queue: `clockin.ts` (server), `mode=clockin`.
+13b(b). Clock in screen at `/clockin`: `clockin.svelte.ts` (queue, undo, burst settle), `assetTools.svelte.ts`, `CardStage`, `Shoot`, `AssetSheets`; `ShootHeader` takes `title` and `home`. 307 tests. Reviewed in browser.
 
 ## Open decisions
 
@@ -41,19 +35,20 @@
 
 ## Known issues
 
-- Burst undo takes back only the last settled burst, one level. Favorites and album changes are immediate in Immich, so undo and unpicking do not revert them.
+- Burst undo (photoshoot and clock in) takes back only the last settled burst. Favorites and album changes are immediate in Immich, so undo and unpicking do not revert them.
+- Clock in: shots decided before a mid-burst failure cannot be undone.
 - Login error text uses `--cut`, breaking the Two Signals rule (red only for trash).
-- `.timecode` and `.label` styles are duplicated per component. 
+- `.timecode` and `.label` styles are duplicated per component.
+- `/swipe` (305 lines) and `/photoshoot` (266) are over the 200 line rule and duplicate album, favorite and share state. Move them onto `AssetTools`, `CardStage` and `Shoot`.
 - Preload of the next 3 previews: confirm the browser reuses them (cache headers).
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Not reachable. Fixed only by Kit 3.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
-- `decide.ts` still accepts `favorite` and `albumId` on a keep, but the UI no longer sends them (favorite and album are now immediate, see DECISIONS). Remove them once nothing needs them.
+- `decide.ts` still accepts `favorite` and `albumId` on a keep, but the UI no longer sends them. Remove once nothing needs them.
 - Share holds the whole original in memory; iOS may expire the gesture on long videos.
-- Not tested live: startup with server trash disabled. Album add confirmed only by browser review.
-- `src/routes/swipe/+page.svelte` is 305 lines and `src/routes/photoshoot/+page.svelte` 266, over the 200 line rule. Move deck, album and hotkey state into `.svelte.ts` modules.
+- Not tested live: startup with server trash disabled.
 - Task 16: prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/`XFF_DEPTH`, HSTS, no `Vary: Origin` on media.
 - Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
-- On this day: UTC day bounds (a photo near midnight may land on the neighbouring day), years from 1990 only, one Immich search per empty year.
+- On this day: UTC day bounds, years from 1990 only, one Immich search per empty year.
 - Not tested against real Immich: home page library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`.
-- Photoshoot tries up to 10 random seeds per page, one Immich search each.
+- Photoshoot and clock in try up to 10 random seeds per page, one Immich search each.
 - Cursor allows 500 assets per timestamp. No Prettier config; format with tabs, single quotes, width 100, no trailing commas.
