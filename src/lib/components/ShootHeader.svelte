@@ -10,7 +10,7 @@
 		{#if range}<p class="range">{range}</p>{/if}
 	</div>
 	<p class="timecode"><span class="label">Reviewed</span> {reviewed}</p>
-	<a href={resolve('/')}>Swipe</a>
+	<a href={resolve('/swipe')}>Swipe</a>
 </header>
 
 <style>
