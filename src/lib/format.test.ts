@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatBytes, formatRange, formatTaken, infoRows } from './format';
+import { formatBytes, formatRange, formatTaken, infoRows, shootTitle } from './format';
 
 describe('formatTaken', () => {
 	it('keeps the wall-clock date whatever the viewer time zone', () => {
@@ -49,5 +49,20 @@ describe('infoRows', () => {
 			['Dimensions', '4000 × 3000'],
 			['File size', '2.0 KB']
 		]);
+	});
+});
+
+describe('shootTitle', () => {
+	it('rounds seconds to the nearest minute', () => {
+		expect(shootTitle('2022-09-20T15:31:29.000Z')).toBe(formatTaken('2022-09-20T15:31:00.000Z'));
+		expect(shootTitle('2022-09-20T15:31:30.000Z')).toBe(formatTaken('2022-09-20T15:32:00.000Z'));
+	});
+
+	it('rolls over the day when rounding up at midnight', () => {
+		expect(shootTitle('2022-09-20T23:59:45.000Z')).toBe(formatTaken('2022-09-21T00:00:00.000Z'));
+	});
+
+	it('reads September 20, 2022 at 3:31 PM', () => {
+		expect(shootTitle('2022-09-20T15:31:10.000Z')).toMatch(/September 20, 2022.*3:31\s?PM/);
 	});
 });

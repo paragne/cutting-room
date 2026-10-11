@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import '$lib/theme.css';
 	import * as api from '$lib/api';
 	import ModePicker from '$lib/components/ModePicker.svelte';
 	import { formatBytes } from '$lib/format';
@@ -23,7 +22,6 @@
 
 <div class="suite">
 	<header>
-		<h1>Cutting Room</h1>
 		<form method="post" action="/logout">
 			<button type="submit">Log out</button>
 		</form>
@@ -59,19 +57,13 @@
 	}
 	header {
 		display: flex;
+		justify-content: flex-end;
 		align-items: center;
 		gap: 16px;
 		padding: 0 12px;
 		min-height: 48px;
 		background: var(--panel);
 		border-bottom: 1px solid var(--hairline);
-	}
-	h1 {
-		flex: 1;
-		margin: 0;
-		font-size: 15px;
-		font-weight: 600;
-		line-height: 1.3;
 	}
 	header button {
 		min-height: 48px;

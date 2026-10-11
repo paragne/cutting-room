@@ -1,12 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
-
-	let {
-		title = 'Photoshoot',
-		home = false,
-		range,
-		reviewed
-	}: { title?: string; home?: boolean; range: string | null; reviewed: number } = $props();
+	let { title, range }: { title: string; range: string | null } = $props();
 </script>
 
 <header>
@@ -14,8 +7,6 @@
 		<h1>{title}</h1>
 		{#if range}<p class="range">{range}</p>{/if}
 	</div>
-	<p class="timecode"><span class="label">Reviewed</span> {reviewed}</p>
-	<a href={resolve(home ? '/' : '/swipe')}>{home ? 'Home' : 'Swipe'}</a>
 </header>
 
 <style>
@@ -41,26 +32,5 @@
 		margin: 0;
 		font-variant-numeric: tabular-nums;
 		color: var(--text-dim);
-	}
-	.timecode {
-		margin: 0;
-		font-weight: 500;
-		font-variant-numeric: tabular-nums;
-		color: var(--amber);
-	}
-	.label {
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--text-dim);
-	}
-	a {
-		display: grid;
-		align-items: center;
-		min-height: 48px;
-		padding: 0 8px;
-		color: var(--text-dim);
-		text-decoration: none;
 	}
 </style>

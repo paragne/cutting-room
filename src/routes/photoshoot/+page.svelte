@@ -13,7 +13,7 @@
 	import ShootViewer from '$lib/components/ShootViewer.svelte';
 	import UndoButton from '$lib/components/UndoButton.svelte';
 	import type { Hotkeys } from '$lib/albumKeys';
-	import { formatRange } from '$lib/format';
+	import { formatRange, shootTitle } from '$lib/format';
 	import { shareOrDownload } from '$lib/share';
 	import type { AlbumList } from '$lib/server/albums';
 	import type { QueueItem } from '$lib/server/queue';
@@ -35,7 +35,6 @@
 	let viewing = $state<string | null>(null);
 	let loading = $state(true);
 	let busy = $state(false);
-	let reviewed = $state(0);
 	let error = $state<string | null>(null);
 
 	const trashing = $derived(shots.length - picked.length);
@@ -122,7 +121,6 @@
 			}
 		});
 		last = settled;
-		reviewed += settled.decided.length;
 		if (error) shots = shots.filter((s) => !settled.decided.includes(s.id));
 		else await next();
 	}
@@ -135,7 +133,6 @@
 			while (back.decided.length > 0) {
 				await api.undo(back.decided[back.decided.length - 1]!);
 				back.decided.pop();
-				reviewed--;
 			}
 			shots = back.shots;
 			picked = back.picked;
@@ -158,7 +155,7 @@
 {/snippet}
 
 <div class="suite">
-	<ShootHeader {range} {reviewed} />
+	<ShootHeader title={shots.length > 0 ? shootTitle(shots[0]!.localDateTime) : 'Photoshoot'} {range} />
 
 	<div class="stage">
 		<main class="monitor">
@@ -222,7 +219,7 @@
 	.suite {
 		display: flex;
 		flex-direction: column;
-		height: 100dvh;
+		height: 100%;
 		max-width: 960px;
 		margin: 0 auto;
 	}

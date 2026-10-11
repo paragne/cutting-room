@@ -134,8 +134,6 @@
 <div class="suite">
 	<header>
 		<h1>{title}</h1>
-		<p class="timecode"><span class="label">Reviewed</span> {deck.history.length}</p>
-		<a href={resolve('/')}>Home</a>
 	</header>
 
 	{#if deck.current}
@@ -209,7 +207,7 @@
 	.suite {
 		display: flex;
 		flex-direction: column;
-		height: 100dvh;
+		height: 100%;
 		max-width: 960px;
 		margin: 0 auto;
 	}
@@ -228,27 +226,6 @@
 		font-size: 15px;
 		font-weight: 600;
 		line-height: 1.3;
-	}
-	.timecode {
-		margin: 0;
-		font-weight: 500;
-		font-variant-numeric: tabular-nums;
-		color: var(--amber);
-	}
-	.label {
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--text-dim);
-	}
-	header a {
-		display: grid;
-		place-items: center;
-		min-height: 48px;
-		padding: 0 8px;
-		color: var(--text-dim);
-		text-decoration: none;
 	}
 	.monitor {
 		flex: 1;

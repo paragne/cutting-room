@@ -80,11 +80,9 @@
 <div class="suite">
 	<ShootHeader
 		title="Dailies"
-		home
 		range={shift.current?.kind === 'burst'
 			? formatRange(shift.current.items[0]!.localDateTime, shift.current.items.at(-1)!.localDateTime)
 			: null}
-		reviewed={shift.reviewed}
 	/>
 
 	{#if shift.shiftOver}
@@ -140,7 +138,7 @@
 	.suite {
 		display: flex;
 		flex-direction: column;
-		height: 100dvh;
+		height: 100%;
 		max-width: 960px;
 		margin: 0 auto;
 	}

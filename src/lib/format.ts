@@ -9,6 +9,13 @@ export function formatTaken(localDateTime: string): string {
 	});
 }
 
+/** The title of a photoshoot: its earliest shot, rounded to the nearest minute. */
+export function shootTitle(localDateTime: string): string {
+	const minute = 60_000;
+	const rounded = Math.round(new Date(localDateTime).getTime() / minute) * minute;
+	return formatTaken(new Date(rounded).toISOString());
+}
+
 export function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
 	const units = ['KB', 'MB', 'GB'];
