@@ -46,7 +46,6 @@
 - Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 - Whether photoshoot detection (60 s gaps) makes sense on a filtered Custom set.
-- Dailies bursts keep the title "Dailies" with a range; photoshoot uses the time title. Confirm.
 
 ## Known issues
 - 13d not yet viewed in the browser: check `/`, `/dailies`, `/photoshoot`, `/swipe` for clipping under the new 48px bar, and the undo icon.
@@ -60,4 +59,3 @@
 - Task 16: prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/`XFF_DEPTH`, HSTS, no `Vary: Origin` on media.
 - Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
 - Not tested against real Immich: home library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`.
-- Cursor allows 500 assets per timestamp. No Prettier config; format with tabs, single quotes, width 100, no trailing commas.
