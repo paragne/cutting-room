@@ -16,8 +16,8 @@ describe('parseMode', () => {
 		expect(parse('mode=photoshoot')).toEqual({ kind: 'photoshoot' });
 	});
 
-	it('reads clockin', () => {
-		expect(parse('mode=clockin')).toEqual({ kind: 'clockin' });
+	it('reads dailies', () => {
+		expect(parse('mode=dailies')).toEqual({ kind: 'dailies' });
 	});
 
 	it('reads an album by uuid', () => {

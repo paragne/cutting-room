@@ -10,14 +10,14 @@
 	import ShiftSummary from '$lib/components/ShiftSummary.svelte';
 	import ShootHeader from '$lib/components/ShootHeader.svelte';
 	import Shoot from '$lib/components/Shoot.svelte';
-	import { Clockin } from '$lib/clockin.svelte';
+	import { Dailies } from '$lib/dailies.svelte';
 	import { formatRange } from '$lib/format';
 	import { command, digit } from '$lib/keys';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	const shift = new Clockin({ ...api, page: api.clockinPage }, untrack(() => data.shiftMinutes));
+	const shift = new Dailies({ ...api, page: api.dailiesPage }, untrack(() => data.shiftMinutes));
 	const tools = new AssetTools(
 		(e) => shift.fail(e),
 		(id) => {

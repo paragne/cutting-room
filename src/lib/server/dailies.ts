@@ -5,12 +5,12 @@ import { toItem, type QueueItem } from './queue';
 
 export type QueueEntry = { kind: 'card'; item: QueueItem } | { kind: 'burst'; items: QueueItem[] };
 
-export interface ClockinPage {
+export interface DailiesPage {
 	entries: QueueEntry[];
 	cursor: string | null;
 }
 
-const CURSOR = 'clockin';
+const CURSOR = 'dailies';
 const SEED_BATCH = 200;
 // Each seed costs one Immich search to look for a burst, so a page stays small.
 const PAGE_ENTRIES = 10;
@@ -18,7 +18,7 @@ const PAGE_ENTRIES = 10;
 const MISSES = 3;
 
 /** Next page for clock in: random unreviewed photos, each a card or the burst it sits in. */
-export async function clockinPage(db: Db, raw: string | null): Promise<ClockinPage | null> {
+export async function dailiesPage(db: Db, raw: string | null): Promise<DailiesPage | null> {
 	if (raw !== null && raw !== CURSOR) return null;
 	for (let miss = 0; miss < MISSES; miss++) {
 		const assets = await searchRandom({ filter: {}, size: SEED_BATCH });

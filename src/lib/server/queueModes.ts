@@ -99,7 +99,7 @@ async function album(db: Db, albumId: string, raw: string | null): Promise<ModeP
 /** Next page for a mode. Null means the cursor is not one this mode produced. */
 export function nextPage(
 	db: Db,
-	mode: Exclude<Mode, { kind: 'clockin' }>,
+	mode: Exclude<Mode, { kind: 'dailies' }>,
 	raw: string | null
 ): Promise<ModePage | null> {
 	switch (mode.kind) {

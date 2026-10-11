@@ -1,7 +1,7 @@
 import type { Hotkeys } from './albumKeys';
 import type { Page } from './deck.svelte';
 import type { AlbumList } from './server/albums';
-import type { ClockinPage } from './server/clockin';
+import type { DailiesPage } from './server/dailies';
 import type { AssetInfo } from './server/assetInfo';
 import type { Action } from './server/db';
 
@@ -93,8 +93,8 @@ export async function originalFile(id: string): Promise<File> {
 	return new File([blob], info.fileName, { type: blob.type });
 }
 
-export async function clockinPage(cursor: string | null): Promise<ClockinPage> {
-	const query = new URLSearchParams({ mode: 'clockin' });
+export async function dailiesPage(cursor: string | null): Promise<DailiesPage> {
+	const query = new URLSearchParams({ mode: 'dailies' });
 	if (cursor !== null) query.set('cursor', cursor);
-	return (await send(`/api/queue?${query}`)).json() as Promise<ClockinPage>;
+	return (await send(`/api/queue?${query}`)).json() as Promise<DailiesPage>;
 }

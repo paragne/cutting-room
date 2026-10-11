@@ -1,6 +1,6 @@
 import type { AssetResponseDto } from '@immich/sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { clockinPage } from './clockin';
+import { dailiesPage } from './dailies';
 import { openDb, type Db } from './db';
 import { searchAssets, searchRandom } from './immich';
 
@@ -41,12 +41,12 @@ beforeEach(() => {
 
 const ids = (items: { id: string }[]) => items.map((i) => i.id);
 
-describe('clockinPage', () => {
+describe('dailiesPage', () => {
 	it('yields a card for a lone photo', async () => {
 		const lone = asset(9, 3600);
 		library = [lone];
 		vi.mocked(searchRandom).mockResolvedValue([lone]);
-		const page = await clockinPage(db, null);
+		const page = await dailiesPage(db, null);
 		expect(page!.entries).toEqual([
 			expect.objectContaining({
 				kind: 'card',
@@ -59,7 +59,7 @@ describe('clockinPage', () => {
 		const burst = [asset(1, 0), asset(2, 10), asset(3, 20)];
 		library = burst;
 		vi.mocked(searchRandom).mockResolvedValue([burst[1]!]);
-		const page = await clockinPage(db, null);
+		const page = await dailiesPage(db, null);
 		expect(page!.entries).toHaveLength(1);
 		const entry = page!.entries[0];
 		expect(entry?.kind).toBe('burst');
@@ -71,7 +71,7 @@ describe('clockinPage', () => {
 		const lone = asset(9, 3600);
 		library = [...burst, lone];
 		vi.mocked(searchRandom).mockResolvedValue([burst[0]!, burst[2]!, lone]);
-		const page = await clockinPage(db, null);
+		const page = await dailiesPage(db, null);
 		expect(page!.entries.map((e) => e.kind)).toEqual(['burst', 'card']);
 	});
 
@@ -87,7 +87,7 @@ describe('clockinPage', () => {
 			favorite: false
 		});
 		vi.mocked(searchRandom).mockResolvedValue([done, open]);
-		const page = await clockinPage(db, null);
+		const page = await dailiesPage(db, null);
 		expect(page!.entries).toHaveLength(1);
 		expect(page!.entries[0]).toMatchObject({
 			kind: 'card',
@@ -107,11 +107,11 @@ describe('clockinPage', () => {
 			favorite: false
 		});
 		vi.mocked(searchRandom).mockResolvedValue([done]);
-		expect(await clockinPage(db, null)).toEqual({ entries: [], cursor: null });
+		expect(await dailiesPage(db, null)).toEqual({ entries: [], cursor: null });
 		expect(searchRandom).toHaveBeenCalledTimes(3);
 	});
 
 	it('rejects a cursor it did not produce', async () => {
-		expect(await clockinPage(db, 'x')).toBeNull();
+		expect(await dailiesPage(db, 'x')).toBeNull();
 	});
 });

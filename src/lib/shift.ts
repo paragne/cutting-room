@@ -1,4 +1,4 @@
-import type { QueueEntry } from './server/clockin';
+import type { QueueEntry } from './server/dailies';
 
 // Rough seconds a person spends deciding one photo. About 15 minutes for 155 photos in real use.
 const SECONDS_PER_PHOTO = 6;

@@ -1,8 +1,8 @@
 import { AssetTypeEnum } from '@immich/sdk';
 import { describe, expect, it, vi } from 'vitest';
 import { Unauthorized } from './api';
-import { Clockin, type ClockinApi } from './clockin.svelte';
-import type { ClockinPage, QueueEntry } from './server/clockin';
+import { Dailies, type DailiesApi } from './dailies.svelte';
+import type { DailiesPage, QueueEntry } from './server/dailies';
 import type { QueueItem } from './server/queue';
 
 function item(n: number): QueueItem {
@@ -22,22 +22,22 @@ const burst = (...ns: number[]): QueueEntry => ({ kind: 'burst', items: ns.map(i
 // Serves the given pages in order; the last page's cursor is null.
 function fakeApi(pages: QueueEntry[][]) {
 	return {
-		page: vi.fn(async (cursor: string | null): Promise<ClockinPage> => {
+		page: vi.fn(async (cursor: string | null): Promise<DailiesPage> => {
 			const i = cursor === null ? 0 : Number(cursor);
 			return { entries: pages[i] ?? [], cursor: i + 1 < pages.length ? String(i + 1) : null };
 		}),
-		decide: vi.fn<ClockinApi['decide']>(async () => {}),
-		undo: vi.fn<ClockinApi['undo']>(async () => {})
-	} satisfies ClockinApi;
+		decide: vi.fn<DailiesApi['decide']>(async () => {}),
+		undo: vi.fn<DailiesApi['undo']>(async () => {})
+	} satisfies DailiesApi;
 }
 
 async function started(pages: QueueEntry[][], minutes = 15, api = fakeApi(pages)) {
-	const shift = new Clockin(api, minutes);
+	const shift = new Dailies(api, minutes);
 	await shift.refill();
 	return { shift, api };
 }
 
-describe('Clockin', () => {
+describe('Dailies', () => {
 	it('shows the first entry and preloads only the cards after it', async () => {
 		const { shift } = await started([[card(1), burst(2, 3, 4), card(5), card(6)]]);
 		expect(shift.current).toEqual(card(1));

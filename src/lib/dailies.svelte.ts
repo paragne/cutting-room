@@ -1,11 +1,11 @@
 import { Unauthorized } from './api';
-import type { ClockinPage, QueueEntry } from './server/clockin';
+import type { DailiesPage, QueueEntry } from './server/dailies';
 import type { Action } from './server/db';
 import type { QueueItem } from './server/queue';
 import { entryCost, shiftOver } from './shift';
 
-export interface ClockinApi {
-	page(cursor: string | null): Promise<ClockinPage>;
+export interface DailiesApi {
+	page(cursor: string | null): Promise<DailiesPage>;
 	decide(id: string, action: Action): Promise<void>;
 	undo(id: string): Promise<void>;
 }
@@ -26,7 +26,7 @@ const LOW_WATER = 3;
  * The entries ahead and the decisions made this shift. A decide or undo moves
  * the queue only after the server confirms, so a failure leaves it unchanged.
  */
-export class Clockin {
+export class Dailies {
 	history = $state<Done[]>([]);
 	reviewed = $state(0);
 	/** Seconds of work this shift, by `entryCost`. Never shown. */
@@ -39,10 +39,10 @@ export class Clockin {
 	#exhausted = $state(false);
 	#cursor: string | null = null;
 	#fetching: Promise<void> | null = null;
-	#api: ClockinApi;
+	#api: DailiesApi;
 	#minutes: number;
 
-	constructor(api: ClockinApi, shiftMinutes: number) {
+	constructor(api: DailiesApi, shiftMinutes: number) {
 		this.#api = api;
 		this.#minutes = shiftMinutes;
 	}

@@ -1,10 +1,7 @@
 # State
 
 ## Current task
-13c. Tone and terminology. Rewrite the playful copy in plain, strictly business language. Rename
-"Clock in" to "Dailies" (UI copy, then route `/dailies`, `mode=dailies`, `clockin*` files).
-"Photoshoot" is the one word for bursts: sweep "burst" and "shot" wording in UI copy too.
-Single photos are "Singles" (confirmed).
+13d, the first item below.
 
 ## Tasks (one per session, in order)
 13d. Shared top bar for every screen: "Cutting Room" text in the middle (placeholder for the
@@ -21,7 +18,7 @@ Single photos are "Singles" (confirmed).
      the width, tall, subtext says it is the main mode: all unreviewed photos, random, no
      filters); one stats bar with five stats incl. estimated time remaining (6 s per photo);
      "Custom" entry last. Stats: Sorted %, Trashed (count and space), Streak, Photos left, Time
-     left (6 s per photo); fifth stat to confirm (keep rate is the alternate). Keep the old Shuffle
+     left (6 s per photo), Keep rate; fifth stat is keep rate. Keep the old Shuffle
      all, Photoshoot and Album entries until 13h lands Custom; 13h removes them.
 13g. Custom mode, server: filter model (`custom.ts`, parsed and validated like `parseMode`):
      file type, camera vs screenshot, years, date range, albums, location, other metadata Immich
@@ -46,10 +43,11 @@ Single photos are "Singles" (confirmed).
 11. Add to album: `albums.ts`, `/api/albums`, `AlbumSheet`, `albumKeys.ts`, digit hotkeys.
 12, 12b, 12c. Modes (`modes.ts`, `queueModes.ts`), photoshoot at `/photoshoot`, swipe actions (heart, album, details, share, skip, undo).
 13. Home screen at `/`: `stats.ts`, `ModePicker`; swipe moved to `/swipe`.
-13b(a). Clock in queue: `clockin.ts` (server), `mode=clockin`.
-13b(b). Clock in screen at `/clockin`: `clockin.svelte.ts` (queue, undo, burst settle), `assetTools.svelte.ts`, `CardStage`, `Shoot`, `AssetSheets`; `ShootHeader` takes `title` and `home`. Reviewed in browser.
-13b(c). Shifts: `shift.ts` (6 s per photo, `SHIFT_MINUTES` env, default 15), `ShiftSummary`, `/clockin` load, `totals.ts`. Shift ends by estimated work, nothing shown while it runs. 325 tests. Reviewed in browser.
+13b(a). Dailies queue: `dailies.ts` (server), `mode=dailies`.
+13b(b). Dailies screen at `/dailies`: `dailies.svelte.ts` (queue, undo, burst settle), `assetTools.svelte.ts`, `CardStage`, `Shoot`, `AssetSheets`; `ShootHeader` takes `title` and `home`. Reviewed in browser.
+13b(c). Shifts: `shift.ts` (6 s per photo, `SHIFT_MINUTES` env, default 15), `ShiftSummary`, `/dailies` load, `totals.ts`. Shift ends by estimated work, nothing shown while it runs. 325 tests. Reviewed in browser.
 13b(d-pre). Burst viewer: "Keep all", prev/next arrows and swipe, tap outside the photo closes (`ShootViewer`, `viewer.ts`).
+13c. Plain copy, "Dailies" name, `/dailies` route, `mode=dailies`, `dailies*` files and class renamed.
 13b(d), 13b(e). Dropped: the clock-in animation was never shipped. All animation removed; On this day removed.
 
 ## Open decisions

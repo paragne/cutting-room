@@ -19,7 +19,7 @@
 </script>
 
 <nav aria-label="Modes">
-	<a href={resolve('/clockin')}>
+	<a href={resolve('/dailies')}>
 		<span class="name">Dailies</span>
 		<span class="hint">Photos and photoshoots in one shift</span>
 	</a>
