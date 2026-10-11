@@ -73,3 +73,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-10: The key gains albumAsset.delete so the album sheet can toggle membership. It cannot delete albums or assets.
 - 2026-10-10: Burst decisions go out one request per shot after "Keep N, trash M", and burst undo takes back only the last settled burst, client side, by undoing each shot.
 - 2026-10-10: Main mode is named "Clock in" (start shift), planned as task 13b with a clocking-in animation.
+- 2026-10-11: Home shows percent sorted as reviewed / (library now + trashed by us), since trashed assets leave Immich's count. Space trashed comes from `decisions.bytes`, not Immich's trash, so outside deletions and the 30 day purge do not change it. No `/api/stats`: the page load reads the DB.
