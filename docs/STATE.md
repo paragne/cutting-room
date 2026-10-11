@@ -18,7 +18,7 @@
      the width, tall, subtext says it is the main mode: all unreviewed photos, random, no
      filters); one stats bar with five stats incl. estimated time remaining (6 s per photo);
      "Custom" entry last. Stats: Sorted %, Trashed (count and space), Streak, Photos left, Time
-     left (6 s per photo), Keep rate; fifth stat is keep rate. Keep the old Shuffle
+     left (6 s per photo), Keep rate. Keep the old Shuffle
      all, Photoshoot and Album entries until 13h lands Custom; 13h removes them.
 13g. Custom mode, server: filter model (`custom.ts`, parsed and validated like `parseMode`):
      file type, camera vs screenshot, years, date range, albums, location, other metadata Immich
