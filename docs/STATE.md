@@ -1,10 +1,8 @@
 # State
 
 ## Current task
-13b(c). Clock in: shift timer (~15 minutes), clock-in animation (card slides into a
-time-clock slot, stamps the time; reduced motion: fade) and between-shift summary
-(whole-library reviewed, trashed, space freed). Split into its own sessions if too big
-(timer and summary first, animation after).
+13b(d). Clock in animation: card slides into a time-clock slot and stamps the time when a
+shift starts or a card is decided. Reduced motion: fade. No timer, percent or count shown.
 
 ## Tasks (one per session, in order)
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
@@ -24,16 +22,20 @@ time-clock slot, stamps the time; reduced motion: fade) and between-shift summar
 12, 12b, 12c. Modes (`modes.ts`, `queueModes.ts`), photoshoot at `/photoshoot`, swipe actions (heart, album, details, share, skip, undo).
 13. Home screen at `/`: `stats.ts`, `ModePicker`; swipe moved to `/swipe`.
 13b(a). Clock in queue: `clockin.ts` (server), `mode=clockin`.
-13b(b). Clock in screen at `/clockin`: `clockin.svelte.ts` (queue, undo, burst settle), `assetTools.svelte.ts`, `CardStage`, `Shoot`, `AssetSheets`; `ShootHeader` takes `title` and `home`. 307 tests. Reviewed in browser.
+13b(b). Clock in screen at `/clockin`: `clockin.svelte.ts` (queue, undo, burst settle), `assetTools.svelte.ts`, `CardStage`, `Shoot`, `AssetSheets`; `ShootHeader` takes `title` and `home`. Reviewed in browser.
+13b(c). Shifts: `shift.ts` (6 s per photo, `SHIFT_MINUTES` env, default 15), `ShiftSummary`, `/clockin` load, `totals.ts`. Shift ends by estimated work, nothing shown while it runs. 325 tests. Reviewed in browser.
+13b(d-pre). Burst viewer: "Keep all", prev/next arrows and swipe, tap outside the photo closes (`ShootViewer`, `viewer.ts`).
 
 ## Open decisions
 
-- Clock in: does the shift timer pause on the summary screen, and is 15 minutes a setting?
 - Clock in costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
 - Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 
 ## Known issues
+
+- Shift: 6 s per photo is a guess from one session. The last entry of a shift cannot be undone once the summary shows. Header on `/clockin` still shows a running `reviewed` count.
+- `/photoshoot` has its own copy of the burst screen logic; it only shares `ShootViewer` and `ShootControls` with `Shoot`.
 
 - Burst undo (photoshoot and clock in) takes back only the last settled burst. Favorites and album changes are immediate in Immich, so undo and unpicking do not revert them.
 - Clock in: shots decided before a mid-burst failure cannot be undone.
