@@ -1,16 +1,13 @@
 # State
 
 ## Current task
-13b(a). Clock in: queue that yields single cards or bursts (split first, see Tasks).
+13b(b). Clock in: the combined screen. Consume `/api/queue?mode=clockin` entries, show a card or the photoshoot view, return to swipe.
 
 ## Tasks (one per session, in order)
 13b. Clock in (also called Start shift): swipe plus photoshoot in ~15 minute shifts.
-    Swipe as normal; when the next random photo sits in a burst, show the photoshoot
-    view, then return to swipe. Between shifts, show whole-library progress
-    (reviewed, trashed, space freed). Starting a shift plays a "clocking in" animation
-    (card slides into a time-clock slot, stamps the time; reduced motion: fade).
-    Split in STATE.md before coding: (a) a queue that yields single cards or bursts,
-    (b) the combined screen, (c) shift timer, clock-in animation and summary screen.
+    (b) the combined screen, (c) shift timer, clock-in animation (card slides into a
+    time-clock slot, stamps the time; reduced motion: fade) and between-shift summary
+    (whole-library reviewed, trashed, space freed). Each is its own session.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
     with deleteAssets (never resolveDuplicates).
 15. Screenshots mode: heuristic (no camera make, screen-ratio dimensions,
@@ -33,9 +30,12 @@
 
 13. Home screen at `/`: `stats.ts` (percent sorted, streak), `ModePicker`, load in `+page.server.ts`. Swipe moved to `/swipe`, header shows the mode name. 288 tests. Reviewed in browser.
 
+13b(a). Clock in queue: `clockin.ts` (`QueueEntry` card or burst), `shootAround` shared with photoshoot, `mode=clockin`. 295 tests. API only, no UI yet.
+
 ## Open decisions
 
 - Clock in: does the shift timer pause on the summary screen, and is 15 minutes a setting?
+- Clock in costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
 - Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 
@@ -56,4 +56,4 @@
 - On this day: UTC day bounds (a photo near midnight may land on the neighbouring day), years from 1990 only, one Immich search per empty year.
 - Not tested against real Immich: home page library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`.
 - Photoshoot tries up to 10 random seeds per page, one Immich search each.
-- Cursor allows 500 assets per timestamp.
+- Cursor allows 500 assets per timestamp. No Prettier config; format with tabs, single quotes, width 100, no trailing commas.
