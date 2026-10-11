@@ -20,8 +20,8 @@
 
 <div class="controls">
 	<button disabled={busy} onclick={onskip}>Skip</button>
-	<button class="settle" disabled={busy || keeping === 0} onclick={onsettle}>
-		{keeping === 0 ? 'Tap the keepers' : `Keep ${keeping}, trash ${trashing}`}
+	<button class="settle" disabled={busy || empty} onclick={onsettle}>
+		{keeping === 0 ? 'Keep all' : `Keep ${keeping}, trash ${trashing}`}
 	</button>
 	<button class="trash" disabled={busy || empty} onclick={ontrashall}>Trash all</button>
 </div>

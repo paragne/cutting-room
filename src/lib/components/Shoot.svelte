@@ -81,15 +81,15 @@
 	keeping={picked.length}
 	trashing={shots.length - picked.length}
 	{onskip}
-	onsettle={() => onsettle(picked)}
+	onsettle={() => onsettle(picked.length > 0 ? picked : shots.map((s) => s.id))}
 	ontrashall={() => onsettle([])}
 />
 
-{#each shots.filter((s) => s.id === viewing) as shot (shot.id)}
-	<ShootViewer bind:id={viewing} picked={picked.includes(shot.id)} ontoggle={() => toggle(shot.id)}>
+<ShootViewer bind:id={viewing} {shots} {picked} ontoggle={toggle}>
+	{#snippet children(shot: QueueItem)}
 		{@render actions(shot, false)}
-	</ShootViewer>
-{/each}
+	{/snippet}
+</ShootViewer>
 
 <style>
 	.stage {

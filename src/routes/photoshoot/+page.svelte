@@ -197,20 +197,16 @@
 		keeping={picked.length}
 		{trashing}
 		onskip={next}
-		onsettle={() => settle(picked)}
+		onsettle={() => settle(picked.length > 0 ? picked : shots.map((s) => s.id))}
 		ontrashall={() => settle([])}
 	/>
 </div>
 
-{#each shots.filter((s) => s.id === viewing) as shot (shot.id)}
-	<ShootViewer
-		bind:id={viewing}
-		picked={picked.includes(shot.id)}
-		ontoggle={() => toggle(shot.id)}
-	>
+<ShootViewer bind:id={viewing} {shots} {picked} ontoggle={toggle}>
+	{#snippet children(shot: QueueItem)}
 		{@render actions(shot, false)}
-	</ShootViewer>
-{/each}
+	{/snippet}
+</ShootViewer>
 
 <AssetAlbums
 	bind:id={albumFor}
