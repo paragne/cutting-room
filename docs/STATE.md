@@ -43,9 +43,8 @@
 
 ## Open decisions
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
-- Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
+- Photoshoot detection (60 s gaps) on a filtered Custom set is unproven. Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
-- Whether photoshoot detection (60 s gaps) makes sense on a filtered Custom set.
 
 ## Known issues
 - 13d not yet viewed in the browser: check `/`, `/dailies`, `/photoshoot`, `/swipe` for clipping under the new 48px bar, and the undo icon.
