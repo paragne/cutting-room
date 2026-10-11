@@ -5,6 +5,7 @@ export type Config = {
 	immichApiKey: string;
 	appPasswordHash: string;
 	dataDir: string;
+	shiftMinutes: number;
 };
 
 export class ConfigError extends Error {
@@ -17,7 +18,8 @@ export function parseConfig(source: Record<string, string | undefined>): Config 
 		immichUrl: parseImmichUrl(source.IMMICH_URL),
 		immichApiKey: parseApiKey(source.IMMICH_API_KEY),
 		appPasswordHash: parsePasswordHash(source.APP_PASSWORD_HASH),
-		dataDir: source.DATA_DIR || 'data'
+		dataDir: source.DATA_DIR || 'data',
+		shiftMinutes: parseShiftMinutes(source.SHIFT_MINUTES)
 	};
 }
 
@@ -64,6 +66,15 @@ function parsePasswordHash(raw: string | undefined): string {
 		throw new ConfigError('APP_PASSWORD_HASH is not output of scripts/hash-password.ts');
 	}
 	return phc;
+}
+
+function parseShiftMinutes(raw: string | undefined): number {
+	if (!raw) return 15;
+	const minutes = Number(raw);
+	if (!Number.isInteger(minutes) || minutes < 1 || minutes > 120) {
+		throw new ConfigError('SHIFT_MINUTES must be a whole number from 1 to 120');
+	}
+	return minutes;
 }
 
 let cached: Config | undefined;

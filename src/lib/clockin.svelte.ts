@@ -2,6 +2,7 @@ import { Unauthorized } from './api';
 import type { ClockinPage, QueueEntry } from './server/clockin';
 import type { Action } from './server/db';
 import type { QueueItem } from './server/queue';
+import { entryCost, shiftOver } from './shift';
 
 export interface ClockinApi {
 	page(cursor: string | null): Promise<ClockinPage>;
@@ -28,6 +29,8 @@ const LOW_WATER = 3;
 export class Clockin {
 	history = $state<Done[]>([]);
 	reviewed = $state(0);
+	/** Seconds of work this shift, by `entryCost`. Never shown. */
+	#spent = $state(0);
 	busy = $state(false);
 	error = $state<string | null>(null);
 	/** The session ended; the screen sends the user to /login. */
@@ -37,9 +40,21 @@ export class Clockin {
 	#cursor: string | null = null;
 	#fetching: Promise<void> | null = null;
 	#api: ClockinApi;
+	#minutes: number;
 
-	constructor(api: ClockinApi) {
+	constructor(api: ClockinApi, shiftMinutes: number) {
 		this.#api = api;
+		this.#minutes = shiftMinutes;
+	}
+
+	get shiftOver(): boolean {
+		return shiftOver(this.#spent, this.#minutes);
+	}
+
+	/** Clears the shift's work. History goes too, so undo cannot reach into the last shift. */
+	nextShift(): void {
+		this.#spent = 0;
+		this.history = [];
 	}
 
 	get current(): QueueEntry | undefined {
@@ -83,6 +98,7 @@ export class Clockin {
 		this.#entries.shift();
 		this.history.push({ entry, action });
 		this.reviewed++;
+		this.#spent += entryCost(entry);
 		await this.refill();
 	}
 
@@ -103,13 +119,17 @@ export class Clockin {
 			return;
 		}
 		this.#entries.shift();
-		this.history.push({ entry: { kind: 'burst', items: [...entry.items] }, picked: keepers, decided });
+		const settled: Burst = { kind: 'burst', items: [...entry.items] };
+		this.history.push({ entry: settled, picked: keepers, decided });
+		this.#spent += entryCost(settled);
 		await this.refill();
 	}
 
 	/** Moves past the current entry without deciding it; it may come up again later. */
 	skip(): void {
-		if (this.busy || !this.current) return;
+		const entry = this.current;
+		if (this.busy || !entry) return;
+		this.#spent += entryCost(entry);
 		this.#entries.shift();
 		void this.refill();
 	}
@@ -132,6 +152,7 @@ export class Clockin {
 		});
 		if (!ok) return undefined;
 		this.history.pop();
+		this.#spent = Math.max(0, this.#spent - entryCost(done.entry));
 		this.#entries.unshift(done.entry);
 		return done;
 	}

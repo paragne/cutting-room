@@ -1,20 +1,24 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import '$lib/theme.css';
 	import * as api from '$lib/api';
 	import { AssetTools } from '$lib/assetTools.svelte';
 	import AssetSheets from '$lib/components/AssetSheets.svelte';
 	import CardStage from '$lib/components/CardStage.svelte';
+	import ShiftSummary from '$lib/components/ShiftSummary.svelte';
 	import ShootHeader from '$lib/components/ShootHeader.svelte';
 	import Shoot from '$lib/components/Shoot.svelte';
 	import { Clockin } from '$lib/clockin.svelte';
 	import { formatRange } from '$lib/format';
 	import { command, digit } from '$lib/keys';
 	import type { Action } from '$lib/server/db';
+	import type { PageProps } from './$types';
 
-	const shift = new Clockin({ ...api, page: api.clockinPage });
+	let { data }: PageProps = $props();
+
+	const shift = new Clockin({ ...api, page: api.clockinPage }, untrack(() => data.shiftMinutes));
 	const tools = new AssetTools(
 		(e) => shift.fail(e),
 		(id) => {
@@ -32,6 +36,9 @@
 	});
 
 	$effect(() => void (shift.expired && goto(resolve('/login'))));
+
+	// The summary shows library totals, so reload them when the shift ends.
+	$effect(() => void (shift.shiftOver && invalidateAll()));
 
 	// A new burst starts with nothing picked.
 	$effect(() => {
@@ -83,7 +90,9 @@
 		reviewed={shift.reviewed}
 	/>
 
-	{#if shift.current?.kind === 'card'}
+	{#if shift.shiftOver}
+		<ShiftSummary totals={data.totals} onnext={() => shift.nextShift()} />
+	{:else if shift.current?.kind === 'card'}
 		<CardStage
 			bind:this={stage}
 			item={shift.current.item}

@@ -15,8 +15,17 @@ describe('parseConfig', () => {
 			immichUrl: 'https://photos.test',
 			immichApiKey: 'abc123DEF456ghi789',
 			appPasswordHash: phc,
-			dataDir: 'data'
+			dataDir: 'data',
+			shiftMinutes: 15
 		});
+	});
+
+	it('reads the shift length', () => {
+		expect(parseConfig({ ...valid, SHIFT_MINUTES: '30' }).shiftMinutes).toBe(30);
+	});
+
+	it.each(['0', '121', '1.5', 'abc'])('rejects SHIFT_MINUTES=%s', (SHIFT_MINUTES) => {
+		expect(() => parseConfig({ ...valid, SHIFT_MINUTES })).toThrow(ConfigError);
 	});
 
 	it('keeps a sub-path for servers behind a path prefix', () => {
