@@ -52,10 +52,9 @@
 - Shift: 6 s per photo is a guess. The last entry of a shift cannot be undone once the summary shows.
 - Burst undo takes back only the last settled burst. Favorites and album changes are immediate in Immich and are not reverted. Dailies: shots decided before a mid-burst failure cannot be undone.
 - `/swipe` (about 280 lines) and `/photoshoot` (about 260) exceed 200 lines and duplicate album, favorite and share state. Both are deleted in 13h.
-- `decide.ts` still accepts `favorite` and `albumId` on a keep; the UI no longer sends them.
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Not reachable. Fixed only by Kit 3.
 - Minor: login error uses `--cut` (breaks Two Signals); `.timecode` and `.label` styles duplicated; preview preload cache headers unchecked; share holds whole original in memory; startup with trash disabled untested.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
 - Task 16: prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/`XFF_DEPTH`, HSTS, no `Vary: Origin` on media.
-- Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
 - Not tested against real Immich: home library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`.
+- Style: tabs, single quotes, width 100, no trailing commas (no Prettier config). Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration. Cursor allows 500 assets per timestamp.
