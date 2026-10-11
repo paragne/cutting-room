@@ -141,20 +141,20 @@ describe('Clockin', () => {
 	});
 
 	describe('shift', () => {
-		// 1 minute is 60 s, so 15 photos at 4 s each.
+		// 1 minute is 60 s, so 10 photos at 6 s each.
 		const many = (n: number) => Array.from({ length: n }, (_, i) => card(i + 1));
 
 		it('ends once the work adds up to the shift length', async () => {
 			const { shift } = await started([many(20)], 1);
-			for (let i = 0; i < 14; i++) await shift.decideCard('keep');
+			for (let i = 0; i < 9; i++) await shift.decideCard('keep');
 			expect(shift.shiftOver).toBe(false);
 			await shift.decideCard('keep');
 			expect(shift.shiftOver).toBe(true);
 		});
 
 		it('counts a burst by its shots', async () => {
-			const shots = Array.from({ length: 16 }, (_, i) => i + 1);
-			const { shift } = await started([[burst(...shots.slice(0, 14)), burst(15, 16, 17)]], 1);
+			const shots = Array.from({ length: 12 }, (_, i) => i + 1);
+			const { shift } = await started([[burst(...shots.slice(0, 9)), burst(10, 11, 12)]], 1);
 			await shift.settle([]);
 			expect(shift.shiftOver).toBe(false);
 			await shift.settle([]);
@@ -163,20 +163,20 @@ describe('Clockin', () => {
 
 		it('counts a skip, so skipping cannot stall a shift', async () => {
 			const { shift } = await started([many(20)], 1);
-			for (let i = 0; i < 15; i++) shift.skip();
+			for (let i = 0; i < 10; i++) shift.skip();
 			expect(shift.shiftOver).toBe(true);
 		});
 
 		it('takes an undone entry back off the shift', async () => {
 			const { shift } = await started([many(20)], 1);
-			for (let i = 0; i < 15; i++) await shift.decideCard('keep');
+			for (let i = 0; i < 10; i++) await shift.decideCard('keep');
 			await shift.undo();
 			expect(shift.shiftOver).toBe(false);
 		});
 
 		it('starts the next shift empty and with no history to undo', async () => {
 			const { shift } = await started([many(40)], 1);
-			for (let i = 0; i < 15; i++) await shift.decideCard('keep');
+			for (let i = 0; i < 10; i++) await shift.decideCard('keep');
 			shift.nextShift();
 			expect(shift.shiftOver).toBe(false);
 			expect(await shift.undo()).toBeUndefined();
