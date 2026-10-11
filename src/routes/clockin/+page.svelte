@@ -79,7 +79,7 @@
 
 <div class="suite">
 	<ShootHeader
-		title="Clock in"
+		title="Dailies"
 		home
 		range={shift.current?.kind === 'burst'
 			? formatRange(shift.current.items[0]!.localDateTime, shift.current.items.at(-1)!.localDateTime)
@@ -115,18 +115,18 @@
 	{:else}
 		<main class="message">
 			{#if shift.done}
-				That's a wrap. Every clip is cut or kept, and the bin is empty.
+				No unreviewed photos left.
 			{:else if loaded}
-				The reel is stuck. Nothing came back from the lab.
+				Could not load photos.
 			{:else}
-				Threading the reel...
+				Loading photos...
 			{/if}
 		</main>
 	{/if}
 
 	{#if shift.error}
 		<p class="error" role="alert">
-			Something jammed: {shift.error}
+			Error: {shift.error}
 			{#if !shift.current}
 				<button onclick={() => shift.refill()}>Retry</button>
 			{/if}

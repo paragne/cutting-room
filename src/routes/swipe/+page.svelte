@@ -165,11 +165,11 @@
 				/>
 			</div>
 		{:else if deck.done}
-			<p class="message">That's a wrap. Every clip is cut or kept, and the bin is empty.</p>
+			<p class="message">No unreviewed photos left.</p>
 		{:else if loaded}
-			<p class="message">The reel is stuck. Nothing came back from the lab.</p>
+			<p class="message">Could not load photos.</p>
 		{:else}
-			<p class="message">Threading the reel...</p>
+			<p class="message">Loading photos...</p>
 		{/if}
 		<UndoButton disabled={deck.busy || deck.history.length === 0} onundo={undo} />
 		{#each deck.upcoming as next (next.id)}
@@ -179,7 +179,7 @@
 
 	{#if deck.error}
 		<p class="error" role="alert">
-			Something jammed: {deck.error}
+			Error: {deck.error}
 			{#if !deck.current}
 				<button onclick={() => deck.refill()}>Retry</button>
 			{/if}

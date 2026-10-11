@@ -15,7 +15,7 @@
 </script>
 
 <main>
-	<h2>Shift over</h2>
+	<h2>Shift complete</h2>
 	<dl>
 		<div>
 			<dt class="label">Sorted</dt>

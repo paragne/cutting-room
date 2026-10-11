@@ -48,7 +48,7 @@
 	<ModePicker onerror={fail} />
 
 	{#if error}
-		<p class="error" role="alert">Something jammed: {error}</p>
+		<p class="error" role="alert">Error: {error}</p>
 	{/if}
 </div>
 

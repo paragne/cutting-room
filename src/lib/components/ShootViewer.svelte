@@ -72,7 +72,7 @@
 	{onpointerup}
 	{onclick}
 	{onkeydown}
-	aria-label="Full screen shot"
+	aria-label="Full screen photo"
 >
 	{#if shot}
 		<img bind:this={img} src="/media/{shot.id}/preview" alt="" />
@@ -83,12 +83,12 @@
 			</button>
 		</div>
 		{#if index > 0}
-			<button class="nav prev" aria-label="Previous shot" onclick={() => go(-1)}>
+			<button class="nav prev" aria-label="Previous photo" onclick={() => go(-1)}>
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
 			</button>
 		{/if}
 		{#if index < shots.length - 1}
-			<button class="nav next" aria-label="Next shot" onclick={() => go(1)}>
+			<button class="nav next" aria-label="Next photo" onclick={() => go(1)}>
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
 			</button>
 		{/if}

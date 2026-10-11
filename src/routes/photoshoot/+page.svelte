@@ -179,16 +179,16 @@
 					{/each}
 				</ul>
 			{:else if loading}
-				<p class="message">Rolling the contact sheet...</p>
+				<p class="message">Loading photoshoot...</p>
 			{:else if !error}
-				<p class="message">No photoshoot turned up this time. Try another roll.</p>
+				<p class="message">No photoshoot found. Try again.</p>
 			{/if}
 		</main>
 		<UndoButton disabled={busy || last === null} onundo={undo} />
 	</div>
 
 	{#if error}
-		<p class="error" role="alert">Something jammed: {error}</p>
+		<p class="error" role="alert">Error: {error}</p>
 	{/if}
 
 	<ShootControls

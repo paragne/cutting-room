@@ -21,7 +21,7 @@
 </script>
 
 <div class="tile">
-	<button class="pick" class:picked aria-pressed={picked} aria-label="Keep this shot" {disabled} onclick={ontoggle}>
+	<button class="pick" class:picked aria-pressed={picked} aria-label="Keep this photo" {disabled} onclick={ontoggle}>
 		<img src="/media/{shot.id}/preview" alt="" />
 	</button>
 	<div class="extras">{@render children()}</div>

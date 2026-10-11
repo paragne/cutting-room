@@ -20,8 +20,8 @@
 
 <nav aria-label="Modes">
 	<a href={resolve('/clockin')}>
-		<span class="name">Clock in</span>
-		<span class="hint">Swipe and photoshoots in one shift</span>
+		<span class="name">Dailies</span>
+		<span class="hint">Photos and photoshoots in one shift</span>
 	</a>
 	<a href="{resolve('/swipe')}?mode=shuffle">
 		<span class="name">Shuffle all</span>
