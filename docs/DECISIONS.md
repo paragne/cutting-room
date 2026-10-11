@@ -79,3 +79,5 @@ Append only. One line per decision, with the reason.
 - 2026-10-11: A Clock in shift ends by estimated work (6 s per photo, a burst counts per shot, skips count), not wall time, and shows no timer, percent or count. Length comes from `SHIFT_MINUTES` (default 15) since anyone self-hosts the app.
 - 2026-10-11: Burst viewer closes on a tap outside the rendered photo, computed from the image's natural size, because object-fit: contain makes the img box cover the matte.
 - 2026-10-11: On this day is removed. It was the least useful mode, and it carried a year-walking cursor and a client-sent `day` for the queue.
+- 2026-10-11: The app has no animation. The clock-in animation (13b(d)) was dropped before it shipped, and the card exit, razor sweep and undo slide are gone. Dragging still moves the card with the finger. Reason: the owner dislikes animation; it also removes the reduced-motion variants.
+- 2026-10-11: Tone is strictly business with film-editing vocabulary. This replaces the earlier playful voice. Existing playful copy is rewritten in the rename task.

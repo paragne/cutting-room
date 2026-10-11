@@ -49,7 +49,7 @@ Modes:
 
 - Shuffle all: random assets from the whole library. This is the default.
 - Photoshoot shuffle: shows one random photoshoot (a burst of photos taken together) and the user picks the best one or more, trashing the rest.
-- Clock in (start shift): swipe and photoshoot combined, entered with a short clocking-in animation. Swipe random photos; when the next one belongs to a burst, show the photoshoot view. Shifts run about 15 minutes, with whole-library progress shown between shifts.
+- Clock in (start shift): swipe and photoshoot combined. Swipe random photos; when the next one belongs to a burst, show the photoshoot view. Shifts run about 15 minutes, with whole-library progress shown between shifts.
 - Single album, screenshots, and Immich duplicate groups (compare side by side, pick keepers).
 
 Open:
@@ -60,7 +60,7 @@ Open:
 ## Brand Commitments
 
 - Name: cutting-room.
-- Voice: playful throughout, including empty states, progress, streaks, and errors. Buttons and controls still say exactly what they do ("Keep", "Trash", "Undo"). Copy on trash and undo must never make the outcome unclear.
+- Voice: strictly business, with film-editing vocabulary (cut, keep, reel, shift). Plain empty states, progress, streaks, and errors, no jokes. Buttons and controls say exactly what they do ("Keep", "Trash", "Undo"). Copy on trash and undo must never make the outcome unclear.
 - No branding, names, illustrations, or copy borrowed from Picnic or any other app.
 
 ## Evidence on Hand
@@ -78,6 +78,6 @@ None yet. No screenshots, user quotes, or usage numbers exist. Do not invent ins
 ## Accessibility & Inclusion
 
 - Comfortable in the dark: no large bright surfaces around the photo.
-- Respect prefers-reduced-motion: swipes and transitions must have a reduced or no-motion version.
+- No animation or transitions anywhere, so nothing depends on prefers-reduced-motion.
 - Full keyboard use: every action reachable without a pointer, with visible focus.
 - WCAG 2.2 AA as the baseline.

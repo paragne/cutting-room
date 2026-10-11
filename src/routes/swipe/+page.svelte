@@ -25,7 +25,6 @@
 	);
 	const deck = new Deck({ ...api, page: (cursor) => api.page(cursor, modeQuery) });
 	let card = $state<ReturnType<typeof Card>>();
-	let from = $state<Action | null>(null);
 	let loaded = $state(false);
 	let albumList = $state<AlbumList>({ albums: [], hotkeys: {} });
 	let albumFor = $state<string | null>(null);
@@ -98,8 +97,7 @@
 	async function decide(action: Action) {
 		const shown = deck.current;
 		if (!shown || deck.busy || !card) return;
-		from = null;
-		await Promise.all([deck.decide(action), card.exit(action)]);
+		await deck.decide(action);
 		if (deck.current === shown) card?.rest();
 	}
 
@@ -108,10 +106,8 @@
 	}
 
 	async function undo() {
-		const last = deck.history.at(-1);
-		if (!last || deck.busy) return;
+		if (deck.history.length === 0 || deck.busy) return;
 		await deck.undo();
-		from = last.action;
 	}
 
 	function onkeydown(e: KeyboardEvent) {
@@ -152,7 +148,6 @@
 				<Card
 					bind:this={card}
 					item={deck.current}
-					{from}
 					disabled={deck.busy}
 					onrelease={decide}
 					onfavorite={toggleFavorite}

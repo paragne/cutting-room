@@ -103,9 +103,11 @@ The world lends palette, type, density, and one signature move. It never supplie
 
 The photo is the only full-color element on screen. Everything around it is near-neutral charcoal so the monitor reads as the brightest thing in a dark room.
 
-**Signature move: the session timeline.** A strip under the monitor records the session as clips. Keep appends a green clip. Trash is a razor cut: a 1px red line sweeps across the photo, then the photo drops off the bottom of the frame and leaves a red clip. Keep slides the photo off to the right. Undo plays the same exit backwards and removes the last clip. The playhead is a 2px amber bar at the right end of the strip.
+**Signature move: the session timeline.** A strip under the monitor records the session as clips. Keep appends a green clip. Trash appends a red clip. The next photo replaces the current one at once. Undo removes the last clip and brings the photo back at once. The playhead is a 2px amber bar at the right end of the strip.
 
-**Motion grammar:** short, directional, no bounce. Slides take 220ms ease-out, the razor 120ms linear. Under `prefers-reduced-motion: reduce`, every transition and entry animation is off and the change is an instant swap.
+**Tone: strictly business.** A working tool with film-editing vocabulary and look, and no jokes or decoration. The same applies to the logo and icons: plain marks, no clapperboards or film-strip clip art.
+
+**Motion: none.** The app has no animation or transition anywhere. Every change is an instant swap. The one movement is the photo following the finger while it is dragged, which is input tracking, not animation. This holds for every user, so there are no `prefers-reduced-motion` variants to maintain.
 
 **Key Characteristics:**
 - Flat charcoal panels separated by 1px hairlines.
@@ -122,7 +124,7 @@ Restrained: tinted-neutral charcoal plus one accent, with green and red reserved
 
 ### Secondary
 - **Keep Green** (`colors.keep-green`): Keep button text, kept clips, the drag hint when the photo moves right.
-- **Cut Red** (`colors.cut-red`): Trash button text, trashed clips, the razor line, the drag hint when the photo moves left.
+- **Cut Red** (`colors.cut-red`): Trash button text, trashed clips, the drag hint when the photo moves left.
 
 ### Neutral
 - **Suite Ground** (`colors.suite-ground`): page background.
@@ -133,7 +135,7 @@ Restrained: tinted-neutral charcoal plus one accent, with green and red reserved
 - **Text** (`colors.text`) and **Text Dim** (`colors.text-dim`): primary and secondary text, key hints, labels, empty-state messages. No pure white anywhere.
 
 ### Named Rules
-**The Monitor Rule.** The photo is the brightest and only saturated surface. Over the photo sit only the drag hint, the corner ticks, the Video tag, and the razor line.
+**The Monitor Rule.** The photo is the brightest and only saturated surface. Over the photo sit only the drag hint, the corner ticks, and the Video tag.
 
 **The Two Signals Rule.** Green means keep and red means trash. Do not use either for anything else, including success or error messages.
 
@@ -185,7 +187,7 @@ Square-ish: 2px on small elements (clips, overlay tags), 4px on buttons, fields,
 A Panel bar with the date as timecode and a dim Details label. It opens to a two-column list: dim uppercase names, Text values. Empty values are omitted.
 
 ### Overlay tags
-Small Panel blocks (4px 8px, 2px radius, label type) set 12px in from the photo edge: Video at bottom left, the Keep or Trash hint at the top corners. The hint fades in with drag distance.
+Small Panel blocks (4px 8px, 2px radius, label type) set 12px in from the photo edge: Video at bottom left, the Keep or Trash hint at the top corners. The hint's opacity follows drag distance.
 
 ### Timeline (signature)
 28px strip on Panel. Clips are 8px wide, 2px radius, 2px apart, right-aligned, green or red. The most recent 120 show. A 2px amber playhead ends the strip.
@@ -197,12 +199,13 @@ Small Panel blocks (4px 8px, 2px radius, label type) set 12px in from the photo 
 - **Do** use amber only for counters, the playhead, focus, and the login submit.
 - **Do** label buttons literally: Trash, Undo, Keep, Log in.
 - **Do** show the 2px amber focus ring on every interactive element.
-- **Do** provide an instant, motion-free version of every transition.
+- **Do** make every change an instant swap.
 - **Do** keep touch targets at 48px or taller.
 
 ### Don't:
 - **Don't** imitate an editing program's chrome: no menu bars, tool palettes, transport controls, scopes, or waveforms as decoration.
 - **Don't** use another product's names, logos, icons, or exact UI.
-- **Don't** use glow, glass, gradients, neon, or bounce easing.
+- **Don't** add any animation, transition, or fade, for any user.
+- **Don't** use glow, glass, gradients, or neon.
 - **Don't** put cards inside cards or round the photo.
 - **Don't** use large bright surfaces; this is used in the dark.

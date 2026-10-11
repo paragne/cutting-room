@@ -69,6 +69,9 @@ left sends to Immich trash. Single user, one Immich API key held server-side.
 - Read PRODUCT.md and DESIGN.md before any UI work.
 - Mobile first, single column, actions in the lower third.
 - No branding, names, illustrations, or copy from Picnic or any other app.
+- No animation or transitions, anywhere, for any user. No CSS `transition`, `animation`,
+  `@keyframes`, `svelte/transition`, or timers that wait for motion. Changes are instant swaps.
+  Tone is strictly business with film-editing vocabulary.
 - UI work is not done until I have seen it running. Stop and tell me what to check.
 
 ## Session rules

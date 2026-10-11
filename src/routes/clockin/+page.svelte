@@ -13,7 +13,6 @@
 	import { Clockin } from '$lib/clockin.svelte';
 	import { formatRange } from '$lib/format';
 	import { command, digit } from '$lib/keys';
-	import type { Action } from '$lib/server/db';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -26,7 +25,6 @@
 		}
 	);
 	let stage = $state<ReturnType<typeof CardStage>>();
-	let from = $state<Action | null>(null);
 	let picked = $state<string[]>([]);
 	let loaded = $state(false);
 
@@ -49,7 +47,6 @@
 	async function undo() {
 		const done = await shift.undo();
 		if (!done) return;
-		from = 'action' in done ? done.action : null;
 		if ('picked' in done) picked = done.picked;
 	}
 
@@ -97,14 +94,10 @@
 			bind:this={stage}
 			item={shift.current.item}
 			upcoming={shift.upcoming}
-			{from}
 			busy={shift.busy}
 			{tools}
 			canUndo={shift.history.length > 0}
-			ondecide={(action) => {
-				from = null;
-				return shift.decideCard(action);
-			}}
+			ondecide={(action) => shift.decideCard(action)}
 			onundo={undo}
 			onskip={() => shift.skip()}
 		/>

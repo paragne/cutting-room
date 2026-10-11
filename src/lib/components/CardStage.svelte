@@ -11,7 +11,6 @@
 	let {
 		item,
 		upcoming,
-		from,
 		busy,
 		tools,
 		canUndo,
@@ -21,8 +20,6 @@
 	}: {
 		item: QueueItem;
 		upcoming: QueueItem[];
-		/** The side an undone card comes back from. */
-		from: Action | null;
 		busy: boolean;
 		tools: AssetTools;
 		canUndo: boolean;
@@ -33,11 +30,11 @@
 
 	let card = $state<ReturnType<typeof Card>>();
 
-	/** Runs the exit animation while the server call is in flight; the card stays if it failed. */
+	/** The card stays where it was released while the server call is in flight, and comes back if it failed. */
 	export async function decide(action: Action): Promise<void> {
 		if (busy || !card) return;
 		const shown = item;
-		await Promise.all([ondecide(action), card.exit(action)]);
+		await ondecide(action);
 		if (item === shown) card?.rest();
 	}
 </script>
@@ -49,7 +46,6 @@
 		<Card
 			bind:this={card}
 			{item}
-			{from}
 			disabled={busy}
 			onrelease={decide}
 			onfavorite={() => tools.toggleFavorite(item)}
