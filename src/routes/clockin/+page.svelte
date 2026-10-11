@@ -7,8 +7,10 @@
 	import { AssetTools } from '$lib/assetTools.svelte';
 	import AssetSheets from '$lib/components/AssetSheets.svelte';
 	import CardStage from '$lib/components/CardStage.svelte';
+	import ShootHeader from '$lib/components/ShootHeader.svelte';
 	import Shoot from '$lib/components/Shoot.svelte';
 	import { Clockin } from '$lib/clockin.svelte';
+	import { formatRange } from '$lib/format';
 	import { command, digit } from '$lib/keys';
 	import type { Action } from '$lib/server/db';
 
@@ -72,11 +74,14 @@
 <svelte:window {onkeydown} />
 
 <div class="suite">
-	<header>
-		<h1>Clock in</h1>
-		<p class="timecode"><span class="label">Reviewed</span> {shift.reviewed}</p>
-		<a href={resolve('/')}>Home</a>
-	</header>
+	<ShootHeader
+		title="Clock in"
+		home
+		range={shift.current?.kind === 'burst'
+			? formatRange(shift.current.items[0]!.localDateTime, shift.current.items.at(-1)!.localDateTime)
+			: null}
+		reviewed={shift.reviewed}
+	/>
 
 	{#if shift.current?.kind === 'card'}
 		<CardStage
@@ -136,41 +141,6 @@
 		height: 100dvh;
 		max-width: 960px;
 		margin: 0 auto;
-	}
-	header {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		padding: 0 12px;
-		min-height: 48px;
-		background: var(--panel);
-		border-bottom: 1px solid var(--hairline);
-	}
-	h1 {
-		flex: 1;
-		margin: 0;
-		font-size: 15px;
-		font-weight: 600;
-	}
-	.timecode {
-		margin: 0;
-		font-variant-numeric: tabular-nums;
-		color: var(--amber);
-	}
-	.label {
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--text-dim);
-	}
-	header a {
-		display: grid;
-		place-items: center;
-		min-height: 48px;
-		padding: 0 8px;
-		color: var(--text-dim);
-		text-decoration: none;
 	}
 	.message {
 		flex: 1;

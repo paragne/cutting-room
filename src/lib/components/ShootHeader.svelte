@@ -1,16 +1,21 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 
-	let { range, reviewed }: { range: string | null; reviewed: number } = $props();
+	let {
+		title = 'Photoshoot',
+		home = false,
+		range,
+		reviewed
+	}: { title?: string; home?: boolean; range: string | null; reviewed: number } = $props();
 </script>
 
 <header>
 	<div class="title">
-		<h1>Photoshoot</h1>
+		<h1>{title}</h1>
 		{#if range}<p class="range">{range}</p>{/if}
 	</div>
 	<p class="timecode"><span class="label">Reviewed</span> {reviewed}</p>
-	<a href={resolve('/swipe')}>Swipe</a>
+	<a href={resolve(home ? '/' : '/swipe')}>{home ? 'Home' : 'Swipe'}</a>
 </header>
 
 <style>
