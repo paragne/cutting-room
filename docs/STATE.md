@@ -3,7 +3,8 @@
 ## Current task
 13c. Tone and terminology. Rewrite the playful copy in plain, strictly business language. Rename
 "Clock in" to "Dailies" (UI copy, then route `/dailies`, `mode=dailies`, `clockin*` files).
-"Photoshoot" is the one word for bursts. Single photos are "Singles" (proposed, confirm).
+"Photoshoot" is the one word for bursts: sweep "burst" and "shot" wording in UI copy too.
+Single photos are "Singles" (confirmed).
 
 ## Tasks (one per session, in order)
 13d. Shared top bar for every screen: "Cutting Room" text in the middle (placeholder for the
@@ -11,14 +12,17 @@
      earliest shot's time rounded to the minute ("September 20, 2022 at 3:31 PM"). Undo button
      becomes the MDI undo icon (inline SVG path, no package; check the path renders).
 13e. Photoshoot grid rework: tap a photo opens fullscreen (no fullscreen button); hold ~300 ms
-     enters select mode with a large "KEEP? ( )" checkbox top right of every photo; on hover
-     only favorite (bottom right) and album (bottom left) show; fullscreen keeps the five
+     enters select mode (all unchecked; confirming with none ticked trashes the whole photoshoot,
+     labelled "Trash N") with a large "KEEP? ( )" checkbox top right of every photo; on hover
+     only favorite (bottom right) and album (bottom left) show (hidden on touch); fullscreen keeps the five
      buttons top right and its keep button matches the grid checkbox. Fix: after closing
      fullscreen the five buttons stay on the photo.
 13f. Home screen: top bar with a log out icon (MDI) top right; a big "Dailies" card (most of
      the width, tall, subtext says it is the main mode: all unreviewed photos, random, no
      filters); one stats bar with five stats incl. estimated time remaining (6 s per photo);
-     "Custom" entry last. Remove Shuffle all, Photoshoot and Album entries.
+     "Custom" entry last. Stats: Sorted %, Trashed (count and space), Streak, Photos left, Time
+     left (6 s per photo); fifth stat to confirm (keep rate is the alternate). Keep the old Shuffle
+     all, Photoshoot and Album entries until 13h lands Custom; 13h removes them.
 13g. Custom mode, server: filter model (`custom.ts`, parsed and validated like `parseMode`):
      file type, camera vs screenshot, years, date range, albums, location, other metadata Immich
      searches; singles / photoshoots / both; reviewed / unreviewed / both; shuffle on or off;
