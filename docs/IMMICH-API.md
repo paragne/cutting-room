@@ -24,7 +24,7 @@ The SDK sends the key as the `x-api-key` header.
 | Trash enabled | `getServerFeatures` (`.trash`) | GET /server/features | none (public) | Live |
 | Trash retention | `getServerConfig` (`.trashDays`) | GET /server/config | none (public) | Live |
 | List, timeline order | `searchAssets` | POST /search/metadata | asset.read | Live |
-| Date range (on this day) | `searchAssets` with `filter.takenAt` | POST /search/metadata | asset.read | Live |
+| Date range (photoshoot window) | `searchAssets` with `filter.takenAt` | POST /search/metadata | asset.read | Live |
 | Single album | `searchAssets` with `filter.albumIds.any` | POST /search/metadata | asset.read | Source |
 | Random (shuffle) | `searchRandom` | POST /search/random | asset.read | Live |
 | Asset metadata | `getAssetInfo` | GET /assets/{id} | asset.read | Live |

@@ -34,9 +34,9 @@
 	let inAlbum = $state<string[]>([]);
 
 	const title = $derived(
-		{ onThisDay: 'On this day', album: albumList.albums.find((a) => a.id === modeQuery.get('album'))?.name }[
-			modeQuery.get('mode') ?? ''
-		] ?? 'Shuffle all'
+		(modeQuery.get('mode') === 'album'
+			? albumList.albums.find((a) => a.id === modeQuery.get('album'))?.name
+			: undefined) ?? 'Shuffle all'
 	);
 
 	onMount(async () => {

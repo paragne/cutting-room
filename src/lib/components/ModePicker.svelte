@@ -27,10 +27,6 @@
 		<span class="name">Shuffle all</span>
 		<span class="hint">Random photos from the whole library</span>
 	</a>
-	<a href="{resolve('/swipe')}?mode=onThisDay">
-		<span class="name">On this day</span>
-		<span class="hint">Today's date in past years</span>
-	</a>
 	<a href={resolve('/photoshoot')}>
 		<span class="name">Photoshoot</span>
 		<span class="hint">Pick the best shots from a burst</span>

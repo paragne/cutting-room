@@ -138,62 +138,6 @@ describe('photoshoot', () => {
 	});
 });
 
-describe('onThisDay', () => {
-	const mode = { kind: 'onThisDay', day: '2026-10-10' } as const;
-
-	async function drain(): Promise<string[]> {
-		const seen: string[] = [];
-		let cursor: string | null = null;
-		do {
-			const page = await nextPage(db, mode, cursor);
-			seen.push(...ids(page!.items));
-			cursor = page!.cursor;
-		} while (cursor !== null);
-		return seen;
-	}
-
-	it('walks past years newest first, oldest first within a year, skipping other days', async () => {
-		const [y2019, late2024, early2024] = [
-			asset(1, '2019-10-10T09:00:00.000Z'),
-			asset(2, '2024-10-10T08:00:00.000Z'),
-			asset(3, '2024-10-10T07:00:00.000Z')
-		];
-		library = [
-			y2019,
-			late2024,
-			early2024,
-			asset(4, '2024-10-11T07:00:00.000Z'),
-			asset(5, '2026-10-10T07:00:00.000Z')
-		];
-		expect(await drain()).toEqual(ids([early2024, late2024, y2019] as AssetResponseDto[]));
-	});
-
-	it('pages through a year with more assets than a page', async () => {
-		library = Array.from({ length: 45 }, (_, i) =>
-			asset(i, new Date(Date.UTC(2022, 9, 10, 0, 0, i)).toISOString())
-		);
-		expect(await drain()).toEqual(ids(library));
-	});
-
-	it('skips reviewed assets', async () => {
-		const [seen, fresh] = [
-			asset(1, '2023-10-10T01:00:00.000Z'),
-			asset(2, '2023-10-10T02:00:00.000Z')
-		];
-		library = [seen, fresh];
-		keep(seen);
-		expect(await drain()).toEqual([fresh.id]);
-	});
-
-	it('ends on an empty library', async () => {
-		expect(await nextPage(db, mode, null)).toEqual({ items: [], cursor: null });
-	});
-
-	it.each(['2000', '1980.', '2025.not-a-cursor', '2025.a.b'])('rejects cursor %j', async (raw) => {
-		expect(await nextPage(db, mode, raw)).toBeNull();
-	});
-});
-
 describe('album', () => {
 	const mode = { kind: 'album', albumId: ALBUM } as const;
 

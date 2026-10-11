@@ -1,7 +1,7 @@
 import type { Db } from './db';
 import { AssetOrder, SearchOrderField, type AssetResponseDto } from '@immich/sdk';
 import { searchAssets, searchRandom } from './immich';
-import { firstPastYear, MIN_YEAR, onThisDayRange, type Mode } from './modes';
+import type { Mode } from './modes';
 import { photoshootAround } from './photoshoot';
 import {
 	decodeCursor,
@@ -9,7 +9,6 @@ import {
 	PAGE_SIZE,
 	scanPage,
 	toItem,
-	type Cursor,
 	type QueueItem
 } from './queue';
 
@@ -87,44 +86,6 @@ async function photoshoot(db: Db): Promise<ModePage> {
 	return { items: [], cursor: PHOTOSHOOT_CURSOR };
 }
 
-// On this day: past years newest first, oldest first within a year. The cursor
-// is the year being scanned, a dot, and that year's keyset cursor (empty at the start).
-function decodeYearCursor(raw: string, day: string): { year: number; c: Cursor | null } | null {
-	const [y, inner, ...rest] = raw.split('.');
-	const year = Number(y);
-	const first = firstPastYear(day);
-	if (rest.length > 0 || inner === undefined || first === null) return null;
-	if (!Number.isInteger(year) || year < MIN_YEAR || year > first) return null;
-	if (inner === '') return { year, c: null };
-	const c = decodeCursor(inner);
-	return c && { year, c };
-}
-
-async function onThisDay(db: Db, day: string, raw: string | null): Promise<ModePage | null> {
-	const first = firstPastYear(day);
-	if (first === null) return { items: [], cursor: null };
-	const start = raw === null ? { year: first, c: null } : decodeYearCursor(raw, day);
-	if (start === null) return null;
-	let c = start.c;
-	for (let year = start.year; year >= MIN_YEAR; year--) {
-		const page = await scanPage(db, { takenAt: onThisDayRange(day, year) }, 'oldest', c);
-		c = null;
-		if (page.cursor) {
-			return {
-				items: page.items,
-				cursor: `${year}.${encodeCursor(page.cursor)}`
-			};
-		}
-		if (page.items.length > 0) {
-			return {
-				items: page.items,
-				cursor: year > MIN_YEAR ? `${year - 1}.` : null
-			};
-		}
-	}
-	return { items: [], cursor: null };
-}
-
 async function album(db: Db, albumId: string, raw: string | null): Promise<ModePage | null> {
 	const cursor = raw === null ? null : decodeCursor(raw);
 	if (raw !== null && cursor === null) return null;
@@ -146,8 +107,6 @@ export function nextPage(
 			return raw === null || raw === SHUFFLE_CURSOR ? shuffle(db) : Promise.resolve(null);
 		case 'photoshoot':
 			return raw === null || raw === PHOTOSHOOT_CURSOR ? photoshoot(db) : Promise.resolve(null);
-		case 'onThisDay':
-			return onThisDay(db, mode.day, raw);
 		case 'album':
 			return album(db, mode.albumId, raw);
 	}

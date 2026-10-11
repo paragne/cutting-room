@@ -33,10 +33,9 @@ export function localDay(d: Date): string {
 	return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-/** `mode` is the `mode` and `album` query of the screen; an on-this-day queue also gets today's date. */
+/** `mode` is the `mode` and `album` query of the screen. */
 export async function page(cursor: string | null, mode: URLSearchParams): Promise<Page> {
 	const query = new URLSearchParams(mode);
-	if (query.get('mode') === 'onThisDay') query.set('day', localDay(new Date()));
 	if (cursor !== null) query.set('cursor', cursor);
 	return (await send(`/api/queue?${query}`)).json() as Promise<Page>;
 }

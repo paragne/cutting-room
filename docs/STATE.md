@@ -50,7 +50,6 @@ shift starts or a card is decided. Reduced motion: fade. No timer, percent or co
 - Not tested live: startup with server trash disabled.
 - Task 16: prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/`XFF_DEPTH`, HSTS, no `Vary: Origin` on media.
 - Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration.
-- On this day: UTC day bounds, years from 1990 only, one Immich search per empty year.
 - Not tested against real Immich: home page library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`.
 - Photoshoot and clock in try up to 10 random seeds per page, one Immich search each.
 - Cursor allows 500 assets per timestamp. No Prettier config; format with tabs, single quotes, width 100, no trailing commas.
