@@ -1,6 +1,7 @@
 import type { Hotkeys } from './albumKeys';
 import type { Page } from './deck.svelte';
 import type { AlbumList } from './server/albums';
+import type { ClockinPage } from './server/clockin';
 import type { AssetInfo } from './server/assetInfo';
 import type { Action } from './server/db';
 
@@ -91,4 +92,10 @@ export async function originalFile(id: string): Promise<File> {
 	const [info, res] = await Promise.all([assetInfo(id), send(`/media/${id}/original`)]);
 	const blob = await res.blob();
 	return new File([blob], info.fileName, { type: blob.type });
+}
+
+export async function clockinPage(cursor: string | null): Promise<ClockinPage> {
+	const query = new URLSearchParams({ mode: 'clockin' });
+	if (cursor !== null) query.set('cursor', cursor);
+	return (await send(`/api/queue?${query}`)).json() as Promise<ClockinPage>;
 }
