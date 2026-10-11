@@ -4,6 +4,7 @@ import { isUuid } from './media';
 export type Mode =
 	| { kind: 'shuffle' }
 	| { kind: 'photoshoot' }
+	| { kind: 'clockin' }
 	| { kind: 'onThisDay'; day: string }
 	| { kind: 'album'; albumId: string };
 
@@ -25,7 +26,7 @@ function yearOf(day: string): number | null {
 /** Returns null when the query names an unknown mode or lacks a valid argument for it. */
 export function parseMode(params: URLSearchParams): Mode | null {
 	const kind = params.get('mode') ?? 'shuffle';
-	if (kind === 'shuffle' || kind === 'photoshoot') return { kind };
+	if (kind === 'shuffle' || kind === 'photoshoot' || kind === 'clockin') return { kind };
 	if (kind === 'onThisDay') {
 		const day = params.get('day');
 		return day !== null && yearOf(day) !== null ? { kind, day } : null;

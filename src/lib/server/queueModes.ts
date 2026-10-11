@@ -1,5 +1,5 @@
 import type { Db } from './db';
-import { AssetOrder, SearchOrderField } from '@immich/sdk';
+import { AssetOrder, SearchOrderField, type AssetResponseDto } from '@immich/sdk';
 import { searchAssets, searchRandom } from './immich';
 import { firstPastYear, MIN_YEAR, onThisDayRange, type Mode } from './modes';
 import { photoshootAround } from './photoshoot';
@@ -44,33 +44,45 @@ const WINDOW_MS = 10 * 60_000;
 const WINDOW_SIZE = 200;
 const PHOTOSHOOT_CURSOR = 'photoshoot';
 
-// One photoshoot per page: random assets are tried as seeds until one sits in a run of
-// unreviewed shots. Trashed and kept shots are skipped, so a half-reviewed burst shrinks.
+// The unreviewed shots around a seed that form a photoshoot, or null if it sits in none.
+// Trashed and kept shots are skipped, so a half-reviewed burst shrinks.
+export async function shootAround(
+	db: Db,
+	seed: AssetResponseDto
+): Promise<AssetResponseDto[] | null> {
+	const t = Date.parse(seed.fileCreatedAt);
+	const near = await searchAssets({
+		filter: {
+			takenAt: {
+				gte: new Date(t - WINDOW_MS).toISOString(),
+				lt: new Date(t + WINDOW_MS + 1).toISOString()
+			}
+		},
+		orderBy: {
+			field: SearchOrderField.FileCreatedAt,
+			direction: AssetOrder.Asc
+		},
+		size: WINDOW_SIZE
+	});
+	const reviewed = new Set(
+		db.reviewedAmong.all(JSON.stringify(near.map((a) => a.id))).map((r) => r.assetId)
+	);
+	const open = near.filter((a) => !reviewed.has(a.id));
+	const shoot = photoshootAround(
+		open.map((a) => ({ id: a.id, at: Date.parse(a.fileCreatedAt) })),
+		seed.id
+	);
+	if (shoot === null) return null;
+	const byId = new Map(open.map((a) => [a.id, a]));
+	return shoot.map((s) => byId.get(s.id)!);
+}
+
+// One photoshoot per page: random assets are tried as seeds until one sits in a shoot.
 async function photoshoot(db: Db): Promise<ModePage> {
 	const seeds = await searchRandom({ filter: {}, size: SEED_BATCH });
 	for (const seed of seeds) {
-		const t = Date.parse(seed.fileCreatedAt);
-		const near = await searchAssets({
-			filter: {
-				takenAt: {
-					gte: new Date(t - WINDOW_MS).toISOString(),
-					lt: new Date(t + WINDOW_MS + 1).toISOString()
-				}
-			},
-			orderBy: { field: SearchOrderField.FileCreatedAt, direction: AssetOrder.Asc },
-			size: WINDOW_SIZE
-		});
-		const reviewed = new Set(
-			db.reviewedAmong.all(JSON.stringify(near.map((a) => a.id))).map((r) => r.assetId)
-		);
-		const open = near.filter((a) => !reviewed.has(a.id));
-		const shoot = photoshootAround(
-			open.map((a) => ({ id: a.id, at: Date.parse(a.fileCreatedAt) })),
-			seed.id
-		);
-		if (shoot === null) continue;
-		const byId = new Map(open.map((a) => [a.id, a]));
-		return { items: shoot.map((s) => toItem(byId.get(s.id)!)), cursor: PHOTOSHOOT_CURSOR };
+		const shoot = await shootAround(db, seed);
+		if (shoot !== null) return { items: shoot.map(toItem), cursor: PHOTOSHOOT_CURSOR };
 	}
 	return { items: [], cursor: PHOTOSHOOT_CURSOR };
 }
@@ -124,7 +136,11 @@ async function album(db: Db, albumId: string, raw: string | null): Promise<ModeP
 }
 
 /** Next page for a mode. Null means the cursor is not one this mode produced. */
-export function nextPage(db: Db, mode: Mode, raw: string | null): Promise<ModePage | null> {
+export function nextPage(
+	db: Db,
+	mode: Exclude<Mode, { kind: 'clockin' }>,
+	raw: string | null
+): Promise<ModePage | null> {
 	switch (mode.kind) {
 		case 'shuffle':
 			return raw === null || raw === SHUFFLE_CURSOR ? shuffle(db) : Promise.resolve(null);

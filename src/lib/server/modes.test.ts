@@ -16,6 +16,10 @@ describe('parseMode', () => {
 		expect(parse('mode=photoshoot')).toEqual({ kind: 'photoshoot' });
 	});
 
+	it('reads clockin', () => {
+		expect(parse('mode=clockin')).toEqual({ kind: 'clockin' });
+	});
+
 	it('reads on this day with a valid day', () => {
 		expect(parse('mode=onThisDay&day=2026-10-10')).toEqual({
 			kind: 'onThisDay',
