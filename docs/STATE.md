@@ -1,15 +1,9 @@
 # State
 
 ## Current task
-13e, the first item below. 13d is committed but not yet seen in the browser (see Known issues).
+13f, the first item below. 13d and 13e are committed but not yet seen in the browser (see Known issues).
 
 ## Tasks (one per session, in order)
-13e. Photoshoot grid rework: tap a photo opens fullscreen (no fullscreen button); hold ~300 ms
-     enters select mode (all unchecked; confirming with none ticked trashes the whole photoshoot,
-     labelled "Trash N") with a large "KEEP? ( )" checkbox top right of every photo; on hover
-     only favorite (bottom right) and album (bottom left) show (hidden on touch); fullscreen keeps the five
-     buttons top right and its keep button matches the grid checkbox. Fix: after closing
-     fullscreen the five buttons stay on the photo.
 13f. Home screen: log out icon (MDI) top right of the top bar; a big "Dailies" card (most of
      the width, tall, subtext says it is the main mode: all unreviewed photos, random, no
      filters); one stats bar with five stats incl. estimated time remaining (6 s per photo);
@@ -40,6 +34,7 @@
 13. Home screen at `/`: `stats.ts`, `ModePicker`.
 13b, 13c. Dailies queue, screen, shifts (6 s per photo, `SHIFT_MINUTES`), burst viewer, plain copy and rename. No animation anywhere.
 13d. Shared top bar in `+layout.svelte` (`TopBar`, hidden on `/login`), `shootTitle` in `format.ts`, MDI undo icon in `UndoButton`. Header counters and home links removed. 310 tests.
+13e. Photoshoot grid in `Shoot`: tap opens fullscreen, 300 ms hold enters select mode (`select.ts`, `KeepBox`), "Trash N" with nothing ticked, hover shows favorite and album only, stuck-buttons fix. 314 tests.
 
 ## Open decisions
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
@@ -48,6 +43,8 @@
 
 ## Known issues
 - 13d not yet viewed in the browser: check `/`, `/dailies`, `/photoshoot`, `/swipe` for clipping under the new 48px bar, and the undo icon.
+- 13e not yet viewed: on a `/dailies` burst check tap, 300 ms hold (no trigger while scrolling on touch), Cancel and "Trash N", hover buttons, fullscreen keep box, and that buttons no longer stick after closing fullscreen (cause guessed: `:focus-within` changed to `:has(:focus-visible)`; Escape close may still show them).
+- `/photoshoot` still uses `ShootControls` (Keep all). Its tiles open fullscreen on tap and are picked there only. Deleted in 13h.
 - Shift: 6 s per photo is a guess. The last entry of a shift cannot be undone once the summary shows.
 - Burst undo takes back only the last settled burst. Favorites and album changes are immediate in Immich and are not reverted. Dailies: shots decided before a mid-burst failure cannot be undone.
 - `/swipe` (about 280 lines) and `/photoshoot` (about 260) exceed 200 lines and duplicate album, favorite and share state. Both are deleted in 13h.
