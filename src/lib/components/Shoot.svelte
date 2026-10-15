@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { AssetTools } from '$lib/assetTools.svelte';
+	import { settleLabel, toggled } from '$lib/select';
 	import type { QueueItem } from '$lib/server/queue';
 	import AssetActions from './AssetActions.svelte';
-	import ShootControls from './ShootControls.svelte';
 	import ShootTile from './ShootTile.svelte';
 	import ShootViewer from './ShootViewer.svelte';
 	import UndoButton from './UndoButton.svelte';
@@ -30,8 +30,23 @@
 
 	let viewing = $state<string | null>(null);
 
+	let entered = $state(false);
+	// A favorite or an album also ticks its shot, which has to be kept.
+	const selecting = $derived(entered || picked.length > 0);
+
+	$effect(() => {
+		void shots;
+		entered = false;
+	});
+
 	function toggle(id: string) {
-		picked = picked.includes(id) ? picked.filter((p) => p !== id) : [...picked, id];
+		entered = true;
+		picked = toggled(picked, id);
+	}
+
+	function cancel() {
+		entered = false;
+		picked = [];
 	}
 
 	// Favorites and albums change in Immich at once; the page also keeps the shot picked.
@@ -75,15 +90,17 @@
 	<UndoButton disabled={busy || !canUndo} {onundo} />
 </div>
 
-<ShootControls
-	{busy}
-	empty={false}
-	keeping={picked.length}
-	trashing={shots.length - picked.length}
-	{onskip}
-	onsettle={() => onsettle(picked.length > 0 ? picked : shots.map((s) => s.id))}
-	ontrashall={() => onsettle([])}
-/>
+<div class="controls">
+	{#if selecting}
+		<button disabled={busy} onclick={cancel}>Cancel</button>
+		<button class="trash" disabled={busy} onclick={() => onsettle(picked)}>
+			{settleLabel(picked.length, shots.length)}
+		</button>
+	{:else}
+		<button disabled={busy} onclick={onskip}>Skip</button>
+		<button class="trash" disabled={busy} onclick={() => onsettle([])}>Trash all</button>
+	{/if}
+</div>
 
 <ShootViewer bind:id={viewing} {shots} {picked} ontoggle={toggle}>
 	{#snippet children(shot: QueueItem)}
@@ -110,5 +127,30 @@
 		margin: 0;
 		padding: 8px;
 		list-style: none;
+	}
+	.controls {
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+		gap: 8px;
+		padding: 12px;
+		background: var(--panel);
+		border-top: 1px solid var(--hairline);
+	}
+	button {
+		min-height: 56px;
+		font: inherit;
+		font-weight: 600;
+		color: var(--text);
+		background: var(--panel-raised);
+		border: 1px solid var(--hairline);
+		border-radius: 4px;
+		cursor: pointer;
+	}
+	.trash:not(:disabled) {
+		color: var(--cut);
+	}
+	button:disabled {
+		opacity: 0.45;
+		cursor: default;
 	}
 </style>

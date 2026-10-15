@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { QueueItem } from '$lib/server/queue';
 	import { insidePhoto, swipeStep } from '$lib/viewer';
+	import KeepBox from './KeepBox.svelte';
 
 	let {
 		id = $bindable<string | null>(null),
@@ -94,11 +95,11 @@
 		{/if}
 		<button
 			class="keep"
-			class:picked={picked.includes(shot.id)}
+			aria-label="Keep this shot"
 			aria-pressed={picked.includes(shot.id)}
 			onclick={() => ontoggle(shot.id)}
 		>
-			{picked.includes(shot.id) ? 'Keeping this shot' : 'Keep this shot'}
+			<KeepBox picked={picked.includes(shot.id)} />
 		</button>
 	{/if}
 </dialog>
@@ -178,18 +179,9 @@
 		left: 50%;
 		bottom: 16px;
 		transform: translateX(-50%);
-		min-height: 56px;
-		padding: 0 24px;
-		font: inherit;
-		font-weight: 600;
-		color: var(--text);
-		background: var(--panel-raised);
-		border: 1px solid var(--hairline);
-		border-radius: 4px;
+		padding: 0;
+		background: none;
+		border: 0;
 		cursor: pointer;
-	}
-	.keep.picked {
-		color: var(--keep);
-		border-color: var(--keep);
 	}
 </style>

@@ -9,7 +9,7 @@
 		oninfo,
 		onshare
 	}: {
-		/** Spread the buttons over the corners of the positioned parent instead of a row. */
+		/** Grid mode: only favorite and album, in the bottom corners of the positioned parent, instead of a row. */
 		corners?: boolean;
 		hearted: boolean;
 		inAlbum: boolean;
@@ -30,16 +30,18 @@
 	<button class="album" aria-label="Add this shot to an album" aria-pressed={inAlbum} {disabled} onclick={onalbum}>
 		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v14H3zM3 6l2-3h14l2 3M9 12h6" /></svg>
 	</button>
-	<button class="info" aria-label="Show details" {disabled} onclick={oninfo}>
-		<svg viewBox="0 0 24 24" aria-hidden="true">
-			<circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" />
-		</svg>
-	</button>
-	<button class="share" aria-label="Share this shot" {disabled} onclick={onshare}>
-		<svg viewBox="0 0 24 24" aria-hidden="true">
-			<path d="M12 15V3M8 7l4-4 4 4M5 12v8h14v-8" />
-		</svg>
-	</button>
+	{#if !corners}
+		<button class="info" aria-label="Show details" {disabled} onclick={oninfo}>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" />
+			</svg>
+		</button>
+		<button class="share" aria-label="Share this shot" {disabled} onclick={onshare}>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M12 15V3M8 7l4-4 4 4M5 12v8h14v-8" />
+			</svg>
+		</button>
+	{/if}
 </div>
 
 <style>
@@ -57,18 +59,10 @@
 		pointer-events: auto;
 	}
 	.corners .heart {
-		top: 6px;
-		right: 48px;
-	}
-	.corners .album {
-		top: 6px;
+		bottom: 6px;
 		right: 6px;
 	}
-	.corners .info {
-		top: 6px;
-		left: 6px;
-	}
-	.corners .share {
+	.corners .album {
 		bottom: 6px;
 		left: 6px;
 	}
