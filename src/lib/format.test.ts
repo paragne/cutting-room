@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatBytes, formatRange, formatTaken, infoRows, shootTitle } from './format';
+import { formatBytes, formatDuration, formatRange, formatTaken, infoRows, shootTitle } from './format';
 
 describe('formatTaken', () => {
 	it('keeps the wall-clock date whatever the viewer time zone', () => {
@@ -64,5 +64,23 @@ describe('shootTitle', () => {
 
 	it('reads September 20, 2022 at 3:31 PM', () => {
 		expect(shootTitle('2022-09-20T15:31:10.000Z')).toMatch(/September 20, 2022.*3:31\s?PM/);
+	});
+});
+
+describe('formatDuration', () => {
+	it('shows minutes under an hour', () => {
+		expect(formatDuration(45 * 60)).toBe('45 min');
+	});
+	it('shows hours and minutes', () => {
+		expect(formatDuration(3 * 3600 + 20 * 60)).toBe('3 h 20 min');
+	});
+	it('drops zero minutes', () => {
+		expect(formatDuration(2 * 3600)).toBe('2 h');
+	});
+	it('rounds to the nearest minute', () => {
+		expect(formatDuration(89)).toBe('1 min');
+	});
+	it('is 0 min for nothing left', () => {
+		expect(formatDuration(0)).toBe('0 min');
 	});
 });

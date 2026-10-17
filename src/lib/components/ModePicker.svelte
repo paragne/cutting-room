@@ -19,9 +19,9 @@
 </script>
 
 <nav aria-label="Modes">
-	<a href={resolve('/dailies')}>
+	<a class="dailies" href={resolve('/dailies')}>
 		<span class="name">Dailies</span>
-		<span class="hint">Photos and photoshoots in one shift</span>
+		<span class="hint">Main mode. All unreviewed photos, random, no filters.</span>
 	</a>
 	<a href="{resolve('/swipe')}?mode=shuffle">
 		<span class="name">Shuffle all</span>
@@ -45,6 +45,10 @@
 			{/if}
 		</div>
 	</div>
+	<div class="custom" aria-disabled="true">
+		<span class="name">Custom</span>
+		<span class="hint">Filters and session length. Not available yet.</span>
+	</div>
 </nav>
 
 <style>
@@ -55,7 +59,8 @@
 		padding: 12px;
 	}
 	a,
-	.album {
+	.album,
+	.custom {
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
@@ -66,6 +71,18 @@
 		background: var(--panel-raised);
 		border: 1px solid var(--hairline);
 		border-radius: 4px;
+	}
+	.dailies {
+		justify-content: flex-end;
+		min-height: 40dvh;
+		padding: 16px;
+		border-color: var(--amber);
+	}
+	.dailies .name {
+		font-size: 24px;
+	}
+	.custom {
+		color: var(--text-dim);
 	}
 	.name {
 		font-weight: 600;

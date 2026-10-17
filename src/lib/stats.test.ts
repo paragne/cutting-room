@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { percentSorted, streak } from './stats';
+import { keepRate, percentSorted, photosLeft, secondsLeft, streak } from './stats';
 
 describe('percentSorted', () => {
 	it('counts trashed assets in the original library size', () => {
@@ -31,5 +31,29 @@ describe('streak', () => {
 	});
 	it('is 0 with no history', () => {
 		expect(streak([], '2026-10-10')).toBe(0);
+	});
+});
+
+describe('photosLeft', () => {
+	it('subtracts kept photos from the library, ignoring trashed ones', () => {
+		expect(photosLeft(70, 40, 10)).toBe(40);
+	});
+	it('never goes below 0', () => {
+		expect(photosLeft(5, 20, 0)).toBe(0);
+	});
+});
+
+describe('secondsLeft', () => {
+	it('is 6 seconds per photo', () => {
+		expect(secondsLeft(100)).toBe(600);
+	});
+});
+
+describe('keepRate', () => {
+	it('is the kept share of all decisions', () => {
+		expect(keepRate(40, 10)).toBeCloseTo(75);
+	});
+	it('is null before any decision', () => {
+		expect(keepRate(0, 0)).toBeNull();
 	});
 });

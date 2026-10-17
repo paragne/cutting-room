@@ -28,6 +28,15 @@ export function formatBytes(bytes: number): string {
 	return `${value.toFixed(1)} ${units[i]}`;
 }
 
+/** Whole hours and minutes, rounded to the nearest minute: "3 h 20 min", "45 min". */
+export function formatDuration(seconds: number): string {
+	const minutes = Math.round(seconds / 60);
+	const h = Math.floor(minutes / 60);
+	const m = minutes % 60;
+	if (h === 0) return `${m} min`;
+	return m === 0 ? `${h} h` : `${h} h ${m} min`;
+}
+
 const TIME = { timeZone: 'UTC', timeStyle: 'medium' } as const;
 
 /** The span of a photoshoot: one date and two times when it stays within a day. */

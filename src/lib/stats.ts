@@ -1,3 +1,5 @@
+import { SECONDS_PER_PHOTO } from './shift';
+
 /** Share of the library reviewed. Trashed assets leave Immich's count, so add them back. */
 export function percentSorted(reviewed: number, libraryNow: number, trashed: number): number {
 	const everything = libraryNow + trashed;
@@ -24,4 +26,18 @@ export function streak(activeDays: string[], today: string): number {
 		day = previousDay(day);
 	}
 	return count;
+}
+
+/** Photos in Immich not yet decided. Trashed ones are already out of `libraryNow`. */
+export function photosLeft(libraryNow: number, reviewed: number, trashed: number): number {
+	return Math.max(0, libraryNow - (reviewed - trashed));
+}
+
+export function secondsLeft(photos: number): number {
+	return photos * SECONDS_PER_PHOTO;
+}
+
+/** Share of decisions that kept the photo, or null before the first decision. */
+export function keepRate(reviewed: number, trashed: number): number | null {
+	return reviewed === 0 ? null : ((reviewed - trashed) / reviewed) * 100;
 }
