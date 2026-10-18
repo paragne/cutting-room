@@ -1,22 +1,16 @@
 # State
 
 ## Current task
-13f, the first item below. 13d and 13e are committed but not yet seen in the browser (see Known issues).
+13g, the first item below.
 
 ## Tasks (one per session, in order)
-13f. Home screen: log out icon (MDI) top right of the top bar; a big "Dailies" card (most of
-     the width, tall, subtext says it is the main mode: all unreviewed photos, random, no
-     filters); one stats bar with five stats incl. estimated time remaining (6 s per photo);
-     "Custom" entry last. Stats: Sorted %, Trashed (count and space), Streak, Photos left, Time
-     left (6 s per photo), Keep rate. Keep the old Shuffle all, Photoshoot and Album entries
-     until 13h lands Custom; 13h removes them.
 13g. Custom mode, server: filter model (`custom.ts`, parsed and validated like `parseMode`):
      file type, camera vs screenshot, years, date range, albums, location, other metadata Immich
      searches; singles / photoshoots / both; reviewed / unreviewed / both; shuffle on or off;
      session length. Pure parsing and queue ordering with tests. Needs a list of which filters
      Immich `searchAssets` supports before building.
 13h. Custom mode, screen: the form and the session at `/custom`. Reuse `Shoot`, `CardStage`,
-     `AssetTools`. Delete `/swipe` and `/photoshoot` (removes the over-200-line duplicates).
+     `AssetTools`. Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
     with deleteAssets (never resolveDuplicates).
 15. Screenshots: heuristic (no camera make, screen-ratio dimensions, PNG, filename) as a pure
@@ -33,8 +27,10 @@
 12-12c. Modes, photoshoot at `/photoshoot`, swipe actions.
 13. Home screen at `/`: `stats.ts`, `ModePicker`.
 13b, 13c. Dailies queue, screen, shifts (6 s per photo, `SHIFT_MINUTES`), burst viewer, plain copy and rename. No animation anywhere.
-13d. Shared top bar in `+layout.svelte` (`TopBar`, hidden on `/login`), `shootTitle` in `format.ts`, MDI undo icon in `UndoButton`. Header counters and home links removed. 310 tests.
-13e. Photoshoot grid in `Shoot`: tap opens fullscreen, 300 ms hold enters select mode (`select.ts`, `KeepBox`), "Trash N" with nothing ticked, hover shows favorite and album only, stuck-buttons fix. 314 tests.
+13d. Shared top bar in `+layout.svelte` (`TopBar`, hidden on `/login`), `shootTitle` in `format.ts`, MDI undo icon in `UndoButton`. Header counters and home links removed.
+13e. Photoshoot grid in `Shoot`: tap opens fullscreen, 300 ms hold enters select mode (`select.ts`, `KeepBox`), "Trash N" with nothing ticked, hover shows favorite and album only, stuck-buttons fix.
+13f. Home screen: logout icon in `TopBar`, tall Dailies card, `StatsBar` (Sorted, Trashed, Streak, Photos left, Time left, Keep rate), disabled Custom entry.
+13e-fix. `/photoshoot` moved onto `Shoot` (hold to select now works there and in Dailies bursts), larger fullscreen keep bar (`KeepBox large`), `ShootControls` deleted. 324 tests.
 
 ## Open decisions
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
@@ -42,12 +38,11 @@
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 
 ## Known issues
-- 13d not yet viewed in the browser: check `/`, `/dailies`, `/photoshoot`, `/swipe` for clipping under the new 48px bar, and the undo icon.
-- 13e not yet viewed: on a `/dailies` burst check tap, 300 ms hold (no trigger while scrolling on touch), Cancel and "Trash N", hover buttons, fullscreen keep box, and that buttons no longer stick after closing fullscreen (cause guessed: `:focus-within` changed to `:has(:focus-visible)`; Escape close may still show them).
-- `/photoshoot` still uses `ShootControls` (Keep all). Its tiles open fullscreen on tap and are picked there only. Deleted in 13h.
+- `/swipe` (about 280 lines) exceeds 200 lines and duplicates album, favorite and share state. Deleted in 13h.
+- Hover and focus buttons on photoshoot tiles: Escape-close of fullscreen may still leave them visible (unconfirmed).
+- Off the DESIGN.md type ramp: 24px Dailies title, 16px large keep label.
 - Shift: 6 s per photo is a guess. The last entry of a shift cannot be undone once the summary shows.
 - Burst undo takes back only the last settled burst. Favorites and album changes are immediate in Immich and are not reverted. Dailies: shots decided before a mid-burst failure cannot be undone.
-- `/swipe` (about 280 lines) and `/photoshoot` (about 260) exceed 200 lines and duplicate album, favorite and share state. Both are deleted in 13h.
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Not reachable. Fixed only by Kit 3.
 - Minor: login error uses `--cut` (breaks Two Signals); `.timecode` and `.label` styles duplicated; preview preload cache headers unchecked; share holds whole original in memory; startup with trash disabled untested.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.

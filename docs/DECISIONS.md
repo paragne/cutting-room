@@ -84,3 +84,6 @@ Append only. One line per decision, with the reason.
 - 2026-10-11: "Clock in" is renamed "Dailies" everywhere, including the route, `mode=dailies` and file names. Film term for the day's raw footage, which is what a shift reviews.
 - 2026-10-11: The top bar lives in the root layout and the layout owns the 100dvh height; pages use height 100%. One bar for every screen except /login, so pages carry no header of their own for navigation. Photoshoot title is the earliest shot rounded to the nearest minute.
 - 2026-10-15: Photoshoot grid has two states. Browsing: tap opens fullscreen, controls are Skip and Trash all. Select mode (300 ms hold, or any tick, favorite or album): tap ticks, unticked shots are trashed, nothing ticked trashes all. "Keep all" is removed because Skip covers it.
+- 2026-10-18: Home stats are one six-cell bar (Sorted, Trashed, Streak, Photos left, Time left, Keep rate). Photos left is library minus kept, since trashed assets already leave Immich's count; time left uses the same 6 s per photo as shifts.
+- 2026-10-18: `/photoshoot` now renders `Shoot` instead of its own grid, so there is one implementation of tap, hold and select. No hover keep button: hold enters select mode and touch has no hover.
+- 2026-10-18: `KeepBox` has a `large` variant for the fullscreen bar only, so the tile marker stays small over the photo.
