@@ -99,7 +99,7 @@
 			aria-pressed={picked.includes(shot.id)}
 			onclick={() => ontoggle(shot.id)}
 		>
-			<KeepBox picked={picked.includes(shot.id)} />
+			<KeepBox large picked={picked.includes(shot.id)} />
 		</button>
 	{/if}
 </dialog>
@@ -176,12 +176,16 @@
 	}
 	.keep {
 		position: absolute;
-		left: 50%;
-		bottom: 16px;
-		transform: translateX(-50%);
+		left: 12px;
+		right: 12px;
+		bottom: 12px;
+		display: grid;
+		place-items: center;
+		min-height: 64px;
 		padding: 0;
-		background: none;
+		background: color-mix(in srgb, var(--matte) 70%, transparent);
 		border: 0;
+		border-radius: 4px;
 		cursor: pointer;
 	}
 </style>

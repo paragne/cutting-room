@@ -1,8 +1,8 @@
 <script lang="ts">
-	let { picked }: { picked: boolean } = $props();
+	let { picked, large = false }: { picked: boolean; large?: boolean } = $props();
 </script>
 
-<span class="keepbox" class:picked>
+<span class="keepbox" class:picked class:large>
 	<span class="label">KEEP?</span>
 	<span class="box">
 		{#if picked}
@@ -33,6 +33,21 @@
 		height: 32px;
 		border: 2px solid var(--text-dim);
 		border-radius: 4px;
+	}
+	.large {
+		gap: 12px;
+		background: none;
+	}
+	.large .label {
+		font-size: 16px;
+	}
+	.large .box {
+		width: 44px;
+		height: 44px;
+	}
+	.large svg {
+		width: 30px;
+		height: 30px;
 	}
 	.picked {
 		color: var(--keep);
