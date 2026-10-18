@@ -77,8 +77,10 @@
 					<ShootTile
 						{shot}
 						picked={picked.includes(shot.id)}
+						{selecting}
 						disabled={busy}
 						ontoggle={() => toggle(shot.id)}
+						onhold={() => toggle(shot.id)}
 						onfullscreen={() => (viewing = shot.id)}
 					>
 						{@render actions(shot, true)}
