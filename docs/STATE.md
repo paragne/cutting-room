@@ -1,14 +1,11 @@
 # State
 
 ## Current task
-13g-b1, the first item below.
+13g-b2, the first item below.
 
 ## Tasks (one per session, in order)
-13g-b1. Custom mode, server: `mode=custom` in `parseMode` and the queue API, filtered scan
-     oldest first or shuffled, reviewed filter (`scanPage` gains a reviewed argument).
-     Flat list; `group` is parsed but not applied yet. Session length is client-side (13h).
 13g-b2. Custom mode, server: singles vs photoshoots (`group`), photoshoot detection on the
-     filtered set.
+     filtered set. Today `group` is parsed but ignored, so Custom pages are a flat list.
 13h. Custom mode, screen: the form and the session at `/custom`. Reuse `Shoot`, `CardStage`,
      `AssetTools`. Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
@@ -32,12 +29,14 @@
 13f. Home screen: logout icon in `TopBar`, tall Dailies card, `StatsBar` (Sorted, Trashed, Streak, Photos left, Time left, Keep rate), disabled Custom entry.
 13e-fix. `/photoshoot` moved onto `Shoot` (hold to select now works there and in Dailies bursts), larger fullscreen keep bar (`KeepBox large`), `ShootControls` deleted. 324 tests.
 13g. Custom filter model: `custom.ts` (`parseCustom`, `customFilter`), filter list in IMMICH-API.md. Years are a span via `from`/`to`. 370 tests.
+13g-b1. `mode=custom` in `parseMode` and `/api/queue`: filtered scan oldest first or shuffled, reviewed filter via `wanted` in `queue.ts`. 382 tests.
 
 ## Open decisions
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
 - Photoshoot detection (60 s gaps) on a filtered Custom set is unproven. Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 - Custom defaults picked in 13g: unreviewed only, no time limit, rating is a minimum, extensions lowercase only. Confirm in 13h.
+- Custom session length (`minutes`) is enforced by the client in 13h; the server ignores it.
 
 ## Known issues
 - `/swipe` (about 280 lines) exceeds 200 lines and duplicates album, favorite and share state. Deleted in 13h.
