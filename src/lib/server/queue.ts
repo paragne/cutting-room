@@ -1,4 +1,5 @@
 import { AssetOrder, SearchOrderField, type AssetResponseDto, type DateFilter } from '@immich/sdk';
+import type { Custom } from './custom';
 import type { Db } from './db';
 import { searchAssets, type AssetFilter } from './immich';
 import { isUuid } from './media';
@@ -26,6 +27,8 @@ export interface QueueItem {
 	/** GIFs play from the original file, since previews are stills. */
 	isGif: boolean;
 }
+
+export type Reviewed = Custom['reviewed'];
 
 export const PAGE_SIZE = 20;
 // Reviewed assets are dropped after fetching, so fetch more than a page at a time.
@@ -68,6 +71,11 @@ function pass(c: Cursor | null, a: AssetResponseDto): Cursor {
 	return { t: a.fileCreatedAt, ids: [a.id] };
 }
 
+/** Whether an asset with this review state passes the reviewed filter. */
+export function wanted(isReviewed: boolean, reviewed: Reviewed): boolean {
+	return reviewed === 'both' || isReviewed === (reviewed === 'yes');
+}
+
 export function toItem(a: AssetResponseDto): QueueItem {
 	return {
 		id: a.id,
@@ -80,14 +88,15 @@ export function toItem(a: AssetResponseDto): QueueItem {
 }
 
 /**
- * Next page of unreviewed timeline assets matching `scope`. A null cursor in the
+ * Next page of timeline assets matching `scope` and `reviewed`. A null cursor in the
  * result means the end. `scope.takenAt` bounds the scan; the cursor tightens it.
  */
 export async function scanPage(
 	db: Db,
 	scope: AssetFilter,
 	order: Order,
-	cursor: Cursor | null
+	cursor: Cursor | null,
+	reviewed: Reviewed = 'no'
 ): Promise<{ items: QueueItem[]; cursor: Cursor | null }> {
 	const items: QueueItem[] = [];
 	let c = cursor;
@@ -103,13 +112,13 @@ export async function scanPage(
 		});
 		const passed = new Set(c?.ids);
 		const fresh = assets.filter((a) => !passed.has(a.id));
-		const reviewed = new Set(
+		const done = new Set(
 			db.reviewedAmong.all(JSON.stringify(fresh.map((a) => a.id))).map((r) => r.assetId)
 		);
 		for (const a of fresh) {
 			if (items.length === PAGE_SIZE) return { items, cursor: c };
 			c = pass(c, a);
-			if (!reviewed.has(a.id)) items.push(toItem(a));
+			if (wanted(done.has(a.id), reviewed)) items.push(toItem(a));
 		}
 		if (assets.length < size) return { items, cursor: null };
 	}

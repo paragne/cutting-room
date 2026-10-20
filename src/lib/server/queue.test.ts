@@ -103,6 +103,16 @@ describe('scanPage', () => {
 		);
 	});
 
+	it.each([
+		['yes', [0, 2]],
+		['both', [0, 1, 2, 3]]
+	] as const)('with reviewed=%s returns assets %j', async (reviewed, expected) => {
+		library = makeLibrary(4);
+		keep(db, [uuid(0), uuid(2)]);
+		const page = await scanPage(db, {}, 'oldest', null, reviewed);
+		expect(page.items.map((i) => i.id)).toEqual(expected.map(uuid));
+	});
+
 	it('does not skip assets when earlier ones are trashed between pages', async () => {
 		library = makeLibrary(120, 3);
 		const all = library.map((a) => a.id);

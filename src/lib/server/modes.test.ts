@@ -34,6 +34,19 @@ describe('parseMode', () => {
 		}
 	);
 
+	it('reads custom settings, ignoring the cursor', () => {
+		const mode = parse('mode=custom&type=photo&shuffle=on&cursor=shuffle');
+		expect(mode?.kind).toBe('custom');
+		expect(mode?.kind === 'custom' && mode.custom).toMatchObject({ type: 'photo', shuffle: true });
+	});
+
+	it.each(['mode=custom&type=gif', 'mode=custom&evil=1', 'mode=custom&from=2021&to=2019'])(
+		'rejects %j',
+		(query) => {
+			expect(parse(query)).toBeNull();
+		}
+	);
+
 	it('rejects an unknown mode', () => {
 		expect(parse('mode=screenshots')).toBeNull();
 	});
