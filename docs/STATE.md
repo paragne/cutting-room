@@ -1,11 +1,14 @@
 # State
 
 ## Current task
-13g-b, the first item below.
+13g-b1, the first item below.
 
 ## Tasks (one per session, in order)
-13g-b. Custom mode, server, part b: queue ordering (singles vs photoshoots, reviewed filter,
-     shuffle, session length) and wiring into `parseMode`, the queue API and `immich.ts`.
+13g-b1. Custom mode, server: `mode=custom` in `parseMode` and the queue API, filtered scan
+     oldest first or shuffled, reviewed filter (`scanPage` gains a reviewed argument).
+     Flat list; `group` is parsed but not applied yet. Session length is client-side (13h).
+13g-b2. Custom mode, server: singles vs photoshoots (`group`), photoshoot detection on the
+     filtered set.
 13h. Custom mode, screen: the form and the session at `/custom`. Reuse `Shoot`, `CardStage`,
      `AssetTools`. Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
