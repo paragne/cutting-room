@@ -85,6 +85,44 @@ Live request that returned the 3 oldest timeline assets:
   "filter": { "visibility": { "eq": "timeline" }, "trashedAt": { "eq": null } } }
 ```
 
+### Custom mode filters
+
+Read from the SDK 3.2.0 types (`SearchFilter`), not tested live. Operators:
+ids take `any`, `all`, `none`; strings take `eq`, `ne`, `in`, `notIn`, and
+nullable strings accept `eq: null`; dates take `gt`, `gte`, `lt`, `lte`;
+patterns add `like`, `startsWith`, `endsWith`; booleans take only `eq`.
+
+| Custom filter | `filter` field | Notes |
+|---|---|---|
+| File type | `type: { in: ['IMAGE', 'VIDEO'] }` | Enum also has `AUDIO`, `OTHER`. No MIME field. |
+| PNG, GIF, other extension | `originalFileName: { endsWith }` | Case sensitivity unknown. |
+| Camera vs no camera | `make: { eq: null }` or `{ ne: null }` | Screenshot heuristic is client-side (task 15). |
+| Date range | `takenAt: { gte, lt }` | Compares `fileCreatedAt`. |
+| Years | `takenAt`, as a span of whole years | Not `or`: `immich.ts` excludes it. How `or` combines with the rest is untested. |
+| Albums | `albumIds: { any }` or `{ none }` | `hasAlbums: { eq: false }` for "in no album". |
+| Location | `country`, `state`, `city` with `eq` or `in` | `eq: null` means no location. Values from `getSearchSuggestions`. |
+| Camera, lens | `make`, `model`, `lensModel` | Values from `getSearchSuggestions`. |
+| Favorite | `isFavorite: { eq }` | |
+| Rating | `rating: { gte }` or `{ eq: null }` | 1 to 5, null is unrated. |
+| People | `personIds: { any }`, `hasPeople: { eq }` | Needs a people list endpoint, not mapped yet. |
+| Tags | `tagIds: { any }`, `hasTags: { eq }` | Needs a tag list endpoint, not mapped yet. |
+| Motion photo | `isMotion: { eq }` | |
+| File size | `fileSizeInBytes: { gte, lt }` | |
+| Text in image | `ocr: { matches }` | Depends on the server running OCR. |
+| Description | `description: { like }` | |
+
+Not offered: `id`, `checksum`, `libraryId`, file paths, `isEncoded`,
+`isOffline`, `createdAt`, `updatedAt`. `visibility` and `trashedAt` stay fixed
+as above.
+
+`getSearchSuggestions({ $type })` returns distinct values for `country`,
+`state`, `city`, `camera-make`, `camera-model`, `camera-lens-model`. It narrows
+by `country`, `state`, `make`, `model`; `includeNull` adds null.
+
+Not Immich filters, handled by the app: singles vs photoshoots (60 s gaps),
+reviewed vs unreviewed (our decisions table), shuffle (`searchRandom` instead of
+`searchAssets` with `orderBy`), session length.
+
 ## Media
 
 - `size=thumbnail` returned `image/webp`. `size=preview` returned `image/jpeg`.
