@@ -1,14 +1,11 @@
 # State
 
 ## Current task
-13g, the first item below.
+13g-b, the first item below.
 
 ## Tasks (one per session, in order)
-13g. Custom mode, server: filter model (`custom.ts`, parsed and validated like `parseMode`):
-     file type, camera vs screenshot, years, date range, albums, location, other metadata Immich
-     searches; singles / photoshoots / both; reviewed / unreviewed / both; shuffle on or off;
-     session length. Pure parsing and queue ordering with tests. Needs a list of which filters
-     Immich `searchAssets` supports before building.
+13g-b. Custom mode, server, part b: queue ordering (singles vs photoshoots, reviewed filter,
+     shuffle, session length) and wiring into `parseMode`, the queue API and `immich.ts`.
 13h. Custom mode, screen: the form and the session at `/custom`. Reuse `Shoot`, `CardStage`,
      `AssetTools`. Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
@@ -31,11 +28,13 @@
 13e. Photoshoot grid in `Shoot`: tap opens fullscreen, 300 ms hold enters select mode (`select.ts`, `KeepBox`), "Trash N" with nothing ticked, hover shows favorite and album only, stuck-buttons fix.
 13f. Home screen: logout icon in `TopBar`, tall Dailies card, `StatsBar` (Sorted, Trashed, Streak, Photos left, Time left, Keep rate), disabled Custom entry.
 13e-fix. `/photoshoot` moved onto `Shoot` (hold to select now works there and in Dailies bursts), larger fullscreen keep bar (`KeepBox large`), `ShootControls` deleted. 324 tests.
+13g. Custom filter model: `custom.ts` (`parseCustom`, `customFilter`), filter list in IMMICH-API.md. Years are a span via `from`/`to`. 370 tests.
 
 ## Open decisions
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
 - Photoshoot detection (60 s gaps) on a filtered Custom set is unproven. Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
+- Custom defaults picked in 13g: unreviewed only, no time limit, rating is a minimum, extensions lowercase only. Confirm in 13h.
 
 ## Known issues
 - `/swipe` (about 280 lines) exceeds 200 lines and duplicates album, favorite and share state. Deleted in 13h.
@@ -47,5 +46,5 @@
 - Minor: login error uses `--cut` (breaks Two Signals); `.timecode` and `.label` styles duplicated; preview preload cache headers unchecked; share holds whole original in memory; startup with trash disabled untested.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
 - Task 16: prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/`XFF_DEPTH`, HSTS, no `Vary: Origin` on media.
-- Not tested against real Immich: home library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`.
+- Not tested against real Immich: home library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`, Custom filters `make: { ne: null }`, `hasAlbums`, `originalFileName.endsWith` case.
 - Style: tabs, single quotes, width 100, no trailing commas (no Prettier config). Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration. Cursor allows 500 assets per timestamp.

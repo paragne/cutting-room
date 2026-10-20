@@ -87,3 +87,4 @@ Append only. One line per decision, with the reason.
 - 2026-10-18: Home stats are one six-cell bar (Sorted, Trashed, Streak, Photos left, Time left, Keep rate). Photos left is library minus kept, since trashed assets already leave Immich's count; time left uses the same 6 s per photo as shifts.
 - 2026-10-18: `/photoshoot` now renders `Shoot` instead of its own grid, so there is one implementation of tap, hold and select. No hover keep button: hold enters select mode and touch has no hover.
 - 2026-10-18: `KeepBox` has a `large` variant for the fullscreen bar only, so the tile marker stays small over the photo.
+- 2026-10-20: Custom mode years are a span (`from=2019&to=2021`) mapped to one `takenAt` range, not Immich `or` branches. `immich.ts` excludes `or` because a branch might match trashed or archived assets, and how `or` combines with other filters is untested.
