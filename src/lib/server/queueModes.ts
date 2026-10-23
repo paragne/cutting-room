@@ -4,6 +4,7 @@ import { customFilter, type Custom } from './custom';
 import { searchAssets, searchRandom, type AssetFilter } from './immich';
 import type { Mode } from './modes';
 import { photoshootAround } from './photoshoot';
+import { groupPage } from './queueGroups';
 import {
 	decodeCursor,
 	encodeCursor,
@@ -25,16 +26,23 @@ const SHUFFLE_BATCH = 200;
 const SHUFFLE_MISSES = 3;
 const SHUFFLE_CURSOR = 'shuffle';
 
-async function shuffle(db: Db, filter: AssetFilter, reviewed: Reviewed): Promise<ModePage> {
+// With `singles`, each candidate costs one window search to rule out a photoshoot.
+async function shuffle(
+	db: Db,
+	filter: AssetFilter,
+	reviewed: Reviewed,
+	singles = false
+): Promise<ModePage> {
 	for (let miss = 0; miss < SHUFFLE_MISSES; miss++) {
 		const assets = await searchRandom({ filter, size: SHUFFLE_BATCH });
 		const done = new Set(
 			db.reviewedAmong.all(JSON.stringify(assets.map((a) => a.id))).map((r) => r.assetId)
 		);
-		const items = assets
-			.filter((a) => wanted(done.has(a.id), reviewed))
-			.slice(0, PAGE_SIZE)
-			.map(toItem);
+		const picks = assets.filter((a) => wanted(done.has(a.id), reviewed)).slice(0, PAGE_SIZE);
+		const items: QueueItem[] = [];
+		for (const a of picks) {
+			if (!singles || (await shootAround(db, a, filter, reviewed)) === null) items.push(toItem(a));
+		}
 		if (items.length > 0) return { items, cursor: SHUFFLE_CURSOR };
 	}
 	return { items: [], cursor: null };
@@ -46,18 +54,25 @@ const WINDOW_MS = 10 * 60_000;
 const WINDOW_SIZE = 200;
 const PHOTOSHOOT_CURSOR = 'photoshoot';
 
-// The unreviewed shots around a seed that form a photoshoot, or null if it sits in none.
-// Trashed and kept shots are skipped, so a half-reviewed burst shrinks.
+// The shots around a seed that pass `filter` and `reviewed` and form a photoshoot, or
+// null if it sits in none. Shots that fail are skipped, so a half-reviewed burst shrinks.
 export async function shootAround(
 	db: Db,
-	seed: AssetResponseDto
+	seed: AssetResponseDto,
+	filter: AssetFilter = {},
+	reviewed: Reviewed = 'no'
 ): Promise<AssetResponseDto[] | null> {
 	const t = Date.parse(seed.fileCreatedAt);
+	const gte = new Date(t - WINDOW_MS).toISOString();
+	const lt = new Date(t + WINDOW_MS + 1).toISOString();
+	const scope = filter.takenAt;
+	// Same-format ISO strings compare in time order, so the window is clipped to the scope.
 	const near = await searchAssets({
 		filter: {
+			...filter,
 			takenAt: {
-				gte: new Date(t - WINDOW_MS).toISOString(),
-				lt: new Date(t + WINDOW_MS + 1).toISOString()
+				gte: scope?.gte !== undefined && scope.gte > gte ? scope.gte : gte,
+				lt: scope?.lt !== undefined && scope.lt < lt ? scope.lt : lt
 			}
 		},
 		orderBy: {
@@ -66,10 +81,10 @@ export async function shootAround(
 		},
 		size: WINDOW_SIZE
 	});
-	const reviewed = new Set(
+	const done = new Set(
 		db.reviewedAmong.all(JSON.stringify(near.map((a) => a.id))).map((r) => r.assetId)
 	);
-	const open = near.filter((a) => !reviewed.has(a.id));
+	const open = near.filter((a) => wanted(done.has(a.id), reviewed));
 	const shoot = photoshootAround(
 		open.map((a) => ({ id: a.id, at: Date.parse(a.fileCreatedAt) })),
 		seed.id
@@ -80,10 +95,14 @@ export async function shootAround(
 }
 
 // One photoshoot per page: random assets are tried as seeds until one sits in a shoot.
-async function photoshoot(db: Db): Promise<ModePage> {
-	const seeds = await searchRandom({ filter: {}, size: SEED_BATCH });
+async function photoshoot(
+	db: Db,
+	filter: AssetFilter = {},
+	reviewed: Reviewed = 'no'
+): Promise<ModePage> {
+	const seeds = await searchRandom({ filter, size: SEED_BATCH });
 	for (const seed of seeds) {
-		const shoot = await shootAround(db, seed);
+		const shoot = await shootAround(db, seed, filter, reviewed);
 		if (shoot !== null) return { items: shoot.map(toItem), cursor: PHOTOSHOOT_CURSOR };
 	}
 	return { items: [], cursor: PHOTOSHOOT_CURSOR };
@@ -93,11 +112,15 @@ async function scan(
 	db: Db,
 	filter: AssetFilter,
 	raw: string | null,
-	reviewed: Reviewed
+	reviewed: Reviewed,
+	group: Custom['group'] = 'both'
 ): Promise<ModePage | null> {
 	const cursor = raw === null ? null : decodeCursor(raw);
 	if (raw !== null && cursor === null) return null;
-	const page = await scanPage(db, filter, 'oldest', cursor, reviewed);
+	const page =
+		group === 'both'
+			? await scanPage(db, filter, 'oldest', cursor, reviewed)
+			: await groupPage(db, filter, cursor, reviewed, group);
 	return {
 		items: page.items,
 		cursor: page.cursor && encodeCursor(page.cursor)
@@ -105,9 +128,15 @@ async function scan(
 }
 
 function custom(db: Db, c: Custom, raw: string | null): Promise<ModePage | null> {
-	if (!c.shuffle) return scan(db, customFilter(c), raw, c.reviewed);
+	const filter = customFilter(c);
+	if (!c.shuffle) return scan(db, filter, raw, c.reviewed, c.group);
+	if (c.group === 'shoots') {
+		return raw === null || raw === PHOTOSHOOT_CURSOR
+			? photoshoot(db, filter, c.reviewed)
+			: Promise.resolve(null);
+	}
 	return raw === null || raw === SHUFFLE_CURSOR
-		? shuffle(db, customFilter(c), c.reviewed)
+		? shuffle(db, filter, c.reviewed, c.group === 'singles')
 		: Promise.resolve(null);
 }
 

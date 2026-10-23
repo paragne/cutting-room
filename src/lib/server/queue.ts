@@ -87,20 +87,25 @@ export function toItem(a: AssetResponseDto): QueueItem {
 	};
 }
 
+export interface Passed {
+	asset: AssetResponseDto;
+	isReviewed: boolean;
+	/** Position just past this asset. */
+	cursor: Cursor;
+}
+
 /**
- * Next page of timeline assets matching `scope` and `reviewed`. A null cursor in the
- * result means the end. `scope.takenAt` bounds the scan; the cursor tightens it.
+ * Timeline assets matching `scope` after `cursor`, fetched in batches as the caller
+ * reads. `scope.takenAt` bounds the scan; the cursor tightens it.
  */
-export async function scanPage(
+export async function* timeline(
 	db: Db,
 	scope: AssetFilter,
 	order: Order,
-	cursor: Cursor | null,
-	reviewed: Reviewed = 'no'
-): Promise<{ items: QueueItem[]; cursor: Cursor | null }> {
-	const items: QueueItem[] = [];
+	cursor: Cursor | null
+): AsyncGenerator<Passed> {
 	let c = cursor;
-	while (items.length < PAGE_SIZE) {
+	for (;;) {
 		const size = BATCH_SIZE + (c?.ids.length ?? 0);
 		const assets = await searchAssets({
 			filter: c ? { ...scope, takenAt: { ...scope.takenAt, ...takenAtBound(order, c.t) } } : scope,
@@ -116,11 +121,27 @@ export async function scanPage(
 			db.reviewedAmong.all(JSON.stringify(fresh.map((a) => a.id))).map((r) => r.assetId)
 		);
 		for (const a of fresh) {
-			if (items.length === PAGE_SIZE) return { items, cursor: c };
 			c = pass(c, a);
-			if (wanted(done.has(a.id), reviewed)) items.push(toItem(a));
+			yield { asset: a, isReviewed: done.has(a.id), cursor: c };
 		}
-		if (assets.length < size) return { items, cursor: null };
+		if (assets.length < size) return;
 	}
-	return { items, cursor: c };
+}
+
+/** Next page of timeline assets matching `scope` and `reviewed`. A null cursor means the end. */
+export async function scanPage(
+	db: Db,
+	scope: AssetFilter,
+	order: Order,
+	cursor: Cursor | null,
+	reviewed: Reviewed = 'no'
+): Promise<{ items: QueueItem[]; cursor: Cursor | null }> {
+	const items: QueueItem[] = [];
+	let c = cursor;
+	for await (const p of timeline(db, scope, order, cursor)) {
+		if (items.length === PAGE_SIZE) return { items, cursor: c };
+		c = p.cursor;
+		if (wanted(p.isReviewed, reviewed)) items.push(toItem(p.asset));
+	}
+	return { items, cursor: null };
 }
