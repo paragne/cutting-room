@@ -1,12 +1,14 @@
 # State
 
 ## Current task
-13h, the first item below.
+13h-a, the first item below.
 
 ## Tasks (one per session, in order)
-13h. Custom mode, screen: the form and the session at `/custom`. Reuse `Shoot`, `CardStage`,
-     `AssetTools`. Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
-     `group=shoots` pages hold one photoshoot (render with `Shoot`); `singles` and `both` are flat lists.
+13h-a. Custom mode, form at `/custom`: enable the Custom entry in `ModePicker`, pure `customQuery`
+     (form values to URL params, defaults left out) with tests, prefill from the query.
+13h-b. Custom mode, session: reuse `Shoot`, `CardStage`, `AssetTools`. `group=shoots` pages hold one
+     photoshoot (render with `Shoot`); `singles` and `both` are flat lists. Client-side `minutes` limit.
+     Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
     with deleteAssets (never resolveDuplicates).
 15. Screenshots: heuristic (no camera make, screen-ratio dimensions, PNG, filename) as a pure
@@ -35,7 +37,6 @@
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
 - Custom `singles` shuffled costs up to 20 window searches per page; unmeasured. Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
-- Custom defaults picked in 13g: unreviewed only, no time limit, rating is a minimum, extensions lowercase only. Confirm in 13h.
 - Custom session length (`minutes`) is enforced by the client in 13h; the server ignores it.
 
 ## Known issues
