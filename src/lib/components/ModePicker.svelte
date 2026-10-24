@@ -45,10 +45,10 @@
 			{/if}
 		</div>
 	</div>
-	<div class="custom" aria-disabled="true">
+	<a href={resolve('/custom')}>
 		<span class="name">Custom</span>
-		<span class="hint">Filters and session length. Not available yet.</span>
-	</div>
+		<span class="hint">Filters and session length</span>
+	</a>
 </nav>
 
 <style>
@@ -59,8 +59,7 @@
 		padding: 12px;
 	}
 	a,
-	.album,
-	.custom {
+	.album {
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
@@ -80,9 +79,6 @@
 	}
 	.dailies .name {
 		font-size: 24px;
-	}
-	.custom {
-		color: var(--text-dim);
 	}
 	.name {
 		font-weight: 600;
