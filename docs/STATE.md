@@ -1,13 +1,12 @@
 # State
 
 ## Current task
-13g-b2, the first item below.
+13h, the first item below.
 
 ## Tasks (one per session, in order)
-13g-b2. Custom mode, server: singles vs photoshoots (`group`), photoshoot detection on the
-     filtered set. Today `group` is parsed but ignored, so Custom pages are a flat list.
 13h. Custom mode, screen: the form and the session at `/custom`. Reuse `Shoot`, `CardStage`,
      `AssetTools`. Delete `/swipe` (over 200 lines, duplicates album, favorite and share state) and `/photoshoot`.
+     `group=shoots` pages hold one photoshoot (render with `Shoot`); `singles` and `both` are flat lists.
 14. Compare: Immich duplicate groups side by side, pick keepers, trash rest
     with deleteAssets (never resolveDuplicates).
 15. Screenshots: heuristic (no camera make, screen-ratio dimensions, PNG, filename) as a pure
@@ -30,10 +29,11 @@
 13e-fix. `/photoshoot` moved onto `Shoot` (hold to select now works there and in Dailies bursts), larger fullscreen keep bar (`KeepBox large`), `ShootControls` deleted. 324 tests.
 13g. Custom filter model: `custom.ts` (`parseCustom`, `customFilter`), filter list in IMMICH-API.md. Years are a span via `from`/`to`. 370 tests.
 13g-b1. `mode=custom` in `parseMode` and `/api/queue`: filtered scan oldest first or shuffled, reviewed filter via `wanted` in `queue.ts`. 382 tests.
+13g-b2. Custom `group`: `queueGroups.ts` (`groupPage`), `timeline()` generator in `queue.ts`, `shootAround` and `photoshoot` take filter and reviewed. 391 tests.
 
 ## Open decisions
 - Dailies costs up to 10 Immich searches per page (one per seed); unmeasured against real Immich.
-- Photoshoot detection (60 s gaps) on a filtered Custom set is unproven. Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
+- Custom `singles` shuffled costs up to 20 window searches per page; unmeasured. Shuffle efficiency once most of the library is reviewed: each call fetches 200 random assets, up to 3 times.
 - Compare: whether a duplicate group stays listed in Immich after its extras are trashed via deleteAssets.
 - Custom defaults picked in 13g: unreviewed only, no time limit, rating is a minimum, extensions lowercase only. Confirm in 13h.
 - Custom session length (`minutes`) is enforced by the client in 13h; the server ignores it.
@@ -44,9 +44,10 @@
 - Off the DESIGN.md type ramp: 24px Dailies title, 16px large keep label.
 - Shift: 6 s per photo is a guess. The last entry of a shift cannot be undone once the summary shows.
 - Burst undo takes back only the last settled burst. Favorites and album changes are immediate in Immich and are not reverted. Dailies: shots decided before a mid-burst failure cannot be undone.
+- Custom groups: a singles page can hold 21 or 22 items. A shoot over 16 splits; a leftover of 1 or 2 is then treated as singles. Pages re-fetch the batch read past a run end.
 - `npm audit`: 3 low, cookie <0.7.0 (GHSA-pxg6-pf52-xh8x) via Kit 2. Not reachable. Fixed only by Kit 3.
 - Minor: login error uses `--cut` (breaks Two Signals); `.timecode` and `.label` styles duplicated; preview preload cache headers unchecked; share holds whole original in memory; startup with trash disabled untested.
 - Spike key (over-privileged, pasted in chat): confirm it is deleted.
 - Task 16: prod node_modules (better-sqlite3, @node-rs/argon2), `ADDRESS_HEADER`/`XFF_DEPTH`, HSTS, no `Vary: Origin` on media.
-- Not tested against real Immich: home library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`, Custom filters `make: { ne: null }`, `hasAlbums`, `originalFileName.endsWith` case.
+- Not tested against real Immich: home library total (`getTimelineStats`), `albumIds.any` filter, `searchRandom` filter, takenAt range semantics, `getAllAlbums` by `assetId`, Custom filters `make: { ne: null }`, `hasAlbums`, `originalFileName.endsWith` case, Custom photoshoot detection on a filtered set.
 - Style: tabs, single quotes, width 100, no trailing commas (no Prettier config). Migrations runner tracks only `user_version`: delete `data/` after editing an uncommitted migration. Cursor allows 500 assets per timestamp.
