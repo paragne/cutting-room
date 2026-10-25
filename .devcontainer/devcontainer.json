@@ -20,7 +20,7 @@
   "initializeCommand": "git config --global user.name > .devcontainer/.git-identity && git config --global user.email >> .devcontainer/.git-identity",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "shutdownAction": "none",
-  "forwardPorts": [5173],
+  "forwardPorts": [5174],
   "customizations": {
     "vscode": {
       "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
